@@ -1490,12 +1490,20 @@
     "@typescript-eslint/types" "5.32.0"
     eslint-visitor-keys "^3.3.0"
 
-"@urql/core@^2.6.1":
+"@urql/core@>=2.5.0", "@urql/core@^2.6.1":
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/@urql/core/-/core-2.6.1.tgz#c10ee972c5e81df6d7bf1e778ef1b5d30e2906e5"
   integrity sha512-gYrEHy3tViJhwIhauK6MIf2Qp09QTsgNHZRd0n71rS+hF6gdwjspf1oKljl4m25+272cJF7fPjBUGmjaiEr7Kg==
   dependencies:
     "@graphql-typed-document-node/core" "^3.1.1"
+    wonka "^4.0.14"
+
+"@urql/exchange-graphcache@^4.4.3":
+  version "4.4.3"
+  resolved "https://registry.yarnpkg.com/@urql/exchange-graphcache/-/exchange-graphcache-4.4.3.tgz#3c8295a16c730918e1d01de42a2f180a777b98ca"
+  integrity sha512-EPXRCzq929RjVDym4NP4mO6bsyGE6J1JzUxE9vpm04VjZtK90Ag4bgftFdkHsMHh4ydvokLKQjCRVqGxKEBnEg==
+  dependencies:
+    "@urql/core" ">=2.5.0"
     wonka "^4.0.14"
 
 "@whatwg-node/fetch@^0.2.3", "@whatwg-node/fetch@^0.2.4":
@@ -3259,6 +3267,14 @@ isomorphic-fetch@^3.0.0:
     node-fetch "^2.6.1"
     whatwg-fetch "^3.4.1"
 
+isomorphic-unfetch@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/isomorphic-unfetch/-/isomorphic-unfetch-3.1.0.tgz#87341d5f4f7b63843d468438128cb087b7c3e98f"
+  integrity sha512-geDJjpoZ8N0kWexiwkX8F9NkTsXhetLPVbZFQ+JTW239QNOwvB0gniuR1Wc6f0AMTn7/mFGyXvHTifrCp/GH8Q==
+  dependencies:
+    node-fetch "^2.6.1"
+    unfetch "^4.2.0"
+
 isomorphic-ws@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/isomorphic-ws/-/isomorphic-ws-5.0.0.tgz#e5529148912ecb9b451b46ed44d53dae1ce04bbf"
@@ -3689,6 +3705,13 @@ natural-compare@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
+
+next-urql@^3.3.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/next-urql/-/next-urql-3.3.3.tgz#3eda3e57c0a51955deba7fd4fba250fc88846874"
+  integrity sha512-mKdpbvxW7FifHjupRKNjE1YuZxhLF+GlN/y1sARcUSEdrCv10dRkFGQl03p4UpWtdggCyZ5lOVBBaQGW7UNfiQ==
+  dependencies:
+    react-ssr-prepass "^1.4.0"
 
 next@12.2.4:
   version "12.2.4"
@@ -4124,6 +4147,11 @@ react-router@6.3.0:
   integrity sha512-7Wh1DzVQ+tlFjkeo+ujvjSqSJmkt1+8JO+T5xklPlgrh70y7ogx75ODRW0ThWhY7S+6yEDks8TYrtQe/aoboBQ==
   dependencies:
     history "^5.2.0"
+
+react-ssr-prepass@^1.4.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-ssr-prepass/-/react-ssr-prepass-1.5.0.tgz#bc4ca7fcb52365e6aea11cc254a3d1bdcbd030c5"
+  integrity sha512-yFNHrlVEReVYKsLI5lF05tZoHveA5pGzjFbFJY/3pOqqjGOmMmqx83N4hIjN2n6E1AOa+eQEUxs3CgRnPmT0RQ==
 
 react-transition-group@^4.4.0, react-transition-group@^4.4.5:
   version "4.4.5"
@@ -4684,6 +4712,11 @@ undici@^5.8.0:
   version "5.8.2"
   resolved "https://registry.yarnpkg.com/undici/-/undici-5.8.2.tgz#071fc8a6a5d24db0ad510ad442f607d9b09d5eec"
   integrity sha512-3KLq3pXMS0Y4IELV045fTxqz04Nk9Ms7yfBBHum3yxsTR4XNn+ZCaUbf/mWitgYDAhsplQ0B1G4S5D345lMO3A==
+
+unfetch@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/unfetch/-/unfetch-4.2.0.tgz#7e21b0ef7d363d8d9af0fb929a5555f6ef97a3be"
+  integrity sha512-F9p7yYCn6cIW9El1zi0HI6vqpeIvBsr3dSuRO6Xuppb1u5rXpCPmMvLSyECLhybr9isec8Ohl0hPekMVrEinDA==
 
 unixify@^1.0.0:
   version "1.0.0"

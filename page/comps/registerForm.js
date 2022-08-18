@@ -3,11 +3,11 @@
 // make material ui form
 import React from "react";
 import { useState, useEffect } from "react";
-import TransitionGroup from "react-transition-group/TransitionGroup";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import Button from "./form/button";
-import Alert from "./form/alert";
+import Button from "./button";
+import Alert from "./alert";
+import usernameHint from "../utils/registerUsernameHint";
 
 import {
   IconButton,
@@ -21,6 +21,8 @@ import {
 import "typeface-roboto";
 import useDeviceSize from "./useDeviceSize";
 import { useRegisterMutation } from "../src/generated/graphql";
+import { TransitionGroup } from "react-transition-group";
+import { useRouter } from "next/router";
 
 // style for small error shown below field
 const errorMessage = {
@@ -52,37 +54,33 @@ function useField(test) {
   };
 }
 
-const REGISTER_MUTATION = ``;
-
 export default function MuiForm(props) {
   const theme = props.theme;
+  const displaySize = props.displaySize;
 
-  const [displaySize] = useDeviceSize();
-
+  const router = useRouter();
   // graphql code generated using @graphql-codegen
   const [, register] = useRegisterMutation();
 
   const [buttonStatus, setButtonStatus] = useState("enabled");
   const [buttonColor, setButtonColor] = useState("primary");
 
-  const [alertStatus, setAlertStatus] = useState(false);
+  const [alertStatus, setAlertStatus] = useState("false");
   const [alertMsg, setAlertMsg] = useState("");
 
-  const [counter, setCounter] = useState(0);
+  const [showComponent, setShowComponent] = useState(false);
 
   const [showPassword, setShowPassword] = useState(false);
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
-  // count to 10 to stagger fields' intro
-  // todo?: find better way
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setCounter(counter + 1);
-    }, 50);
-    if (counter > 10) {
+      setShowComponent(true);
+    }, 100);
+    if (showComponent) {
       clearTimeout(timeout);
     }
-  }, [counter]);
+  }, []);
 
   // initiate all form values inside object form
   const useForm = {
@@ -96,7 +94,7 @@ export default function MuiForm(props) {
       if (e.type === "blur" || useForm[e.target.name].error === true) {
         useForm[e.target.name].validate(e.target.value);
       }
-      setAlertStatus(false);
+      setAlertStatus("false");
       setButtonColor("primary");
     },
     reset: () => {
@@ -113,20 +111,25 @@ export default function MuiForm(props) {
 
   const submitForm = async () => {
     setButtonStatus("sending");
-    setAlertStatus(false);
+    setAlertStatus("false");
 
-    await register({
+    const response = await register({
       firstName: useForm.firstName.text,
       lastName: useForm.lastName.text,
       userName: useForm.userName.text,
       password: useForm.password.text,
     });
 
-    const error = false;
-    if (error) {
+    // if we don't have data or data.reister.status == "failed"
+    if (response.data?.register.status !== "successful") {
       setButtonColor("error");
       setTimeout(() => {
-        setAlertMsg("Failed. Please try again later.");
+        if (response.data) {
+          setAlertMsg(response.data.register.message);
+        } else {
+          console.error(response);
+          setAlertMsg("Unexpected error. Try again later.");
+        }
         setAlertStatus("error");
       }, 200);
     } else {
@@ -142,14 +145,15 @@ export default function MuiForm(props) {
           );
         }
         useForm.reset();
+        3;
       }, 200);
     }
-    // time to server response + 200 ms for resubmission
+    // time to server response + 200ms for resubmission
     setTimeout(() => {
       setButtonStatus("enabled");
     }, 200);
   };
-
+  
   // todo: refactor this function
   const handleSubmitForm = () => {
     setButtonStatus("disabled");
@@ -160,8 +164,8 @@ export default function MuiForm(props) {
       setButtonColor("error");
 
       // remove other message first before warning
-      if (alertStatus !== "warning" && alertStatus !== false) {
-        setAlertStatus(false);
+      if (alertStatus !== "warning" && alertStatus !== "false") {
+        setAlertStatus("false");
         setTimeout(() => {
           setAlertStatus("warning");
         }, 200);
@@ -184,313 +188,271 @@ export default function MuiForm(props) {
       submitForm();
     }
   };
-
+  const handleEnter = (e) => {
+    if (e.key === "Enter") {
+      handleSubmitForm();
+    }
+  };
   return (
     <ThemeProvider theme={theme}>
       <div
         style={{
-          background: theme.palette.background.primary,
           transition: "all 0.3s ease-out",
           width: ["xs", "sm"].includes(displaySize) ? "100%" : 450,
           marginLeft: "auto",
           marginRight: "auto",
           position: "relative",
-          marginTop: ["xs", "sm"].includes(displaySize) ? 0 : 100,
+          marginTop: ["xs", "sm"].includes(displaySize) ? 10 : 100,
         }}
       >
-        <div
+        <Box
+          component="form"
+          noValidate
+          autoComplete="off"
           style={{
-            color: theme.palette.text.primary,
             transition: "all 0.3s ease-in-out",
+            position: "relative",
+            maxHeight: showComponent ? 1000 : 0,
+
+            overflow: "hidden",
+            background: theme.palette.background.default,
+            borderRadius: ["xs", "sm"].includes(displaySize) ? 0 : 15,
+            boxShadow: ["xs", "sm"].includes(displaySize)
+              ? "0px 0px 0px"
+              : `0px 0px 20px ${theme.palette.background.shadow}`,
+            ...(displaySize === "xs"
+              ? {
+                  paddingLeft: 20,
+                  paddingRight: 20,
+                  paddingTop: 20,
+                  paddingBottom: 30,
+                }
+              : displaySize === "sm"
+              ? {
+                  paddingLeft: 50,
+                  paddingRight: 50,
+                  paddingTop: 50,
+                  paddingBottom: 30,
+                }
+              : {
+                  // md, lg and xl
+                  padding: 40,
+                  borderStyle: "solid",
+                  borderWidth: 1,
+                  borderColor: theme.palette.background.border,
+                }),
           }}
         >
-          <Box>
-            <TransitionGroup>
-              <Collapse style={{ position: "relative", zIndex: 1 }}>
-                <Box
-                  //todo*: fix last name animation
-                  component="form"
-                  noValidate
-                  autoComplete="off"
+          <div>
+            <div
+              style={{
+                height: 60,
+                display: "flex",
+                marginTop: 10,
+                fontFamily: "roboto, sans",
+                fontSize: 28,
+                marginLeft: 12,
+                fontWeight: 300,
+                color: theme.palette.text.primary,
+                transition: "all 0.3s",
+                opacity: showComponent ? 1 : 0,
+              }}
+            >
+              Create your account
+            </div>
+            <div
+              style={{
+                display: "flex",
+                transition: "all 0.5s",
+                flexDirection: "row",
+                width: "100%",
+                height: ["xs", "sm"].includes(displaySize) ? 92 : 38,
+                marginBottom: 17,
+              }}
+            >
+              <TextField
+                name="firstName"
+                label="First name"
+                margin="dense"
+                size="small"
+                value={useForm.firstName.text}
+                disabled={buttonStatus === "sending"}
+                error={useForm.firstName.error}
+                onChange={useForm.set}
+                onBlur={useForm.set}
+                onFocus={useForm.set}
+                style={{
+                  width: ["xs", "sm"].includes(displaySize) ? "100%" : 178,
+                  height: 30,
+                  marginBottom: ["xs", "sm"].includes(displaySize) ? 17 : 0,
+                }}
+                inputProps={{ maxLength: 12 }}
+                onKeyDown={handleEnter}
+              />
+              <TextField
+                name="lastName"
+                label="Last name"
+                margin="dense"
+                size="small"
+                value={useForm.lastName.text}
+                disabled={buttonStatus === "sending"}
+                error={useForm.lastName.error}
+                onChange={useForm.set}
+                onBlur={useForm.set}
+                onFocus={useForm.set}
+                style={{
+                  position: "absolute",
+                  width: ["xs", "sm"].includes(displaySize)
+                    ? `calc(100% - ${displaySize === "xs" ? "40" : "100"}px)`
+                    : 178,
+                  height: 30,
+                  right: ["xs", "sm"].includes(displaySize) ? "auto" : 40,
+                  transition: "all 0.3s ease-in-out",
+                  marginTop: ["xs", "sm"].includes(displaySize) ? 62.5 : 8,
+                }}
+                inputProps={{ maxLength: 12 }}
+                onKeyDown={handleEnter}
+              />
+            </div>
+            <TextField
+              name="userName"
+              label="Username"
+              margin="dense"
+              size="small"
+              value={useForm.userName.text}
+              required
+              disabled={buttonStatus === "sending"}
+              error={useForm.userName.error}
+              onChange={useForm.set}
+              onBlur={useForm.set}
+              onFocus={useForm.set}
+              style={{
+                width: "100%",
+                marginBottom: 0,
+              }}
+              inputProps={{ maxLength: 30 }}
+              onKeyDown={handleEnter}
+            />
+            <Collapse in={useForm.userName.error} style={errorMessage}>
+              {usernameHint(useForm.userName.text)}
+            </Collapse>
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              <TextField
+                name="password"
+                label="Password"
+                margin="dense"
+                size="small"
+                required
+                type={showPassword ? "text" : "password"}
+                disabled={buttonStatus === "sending"}
+                value={useForm.password.text}
+                onChange={useForm.set}
+                error={useForm.password.error}
+                onBlur={useForm.set}
+                onFocus={useForm.set}
+                style={{
+                  width: "100%",
+                  marginTop: 15,
+                  marginBottom: 0,
+                }}
+                inputProps={{ maxLength: 100 }}
+                onKeyDown={handleEnter}
+              />
+              <IconButton
+                aria-label="delete"
+                sx={{
+                  width: 50,
+                  height: 50,
+                  marginTop: 1.3,
+                  marginBottom: "auto",
+                  marginLeft: 2,
+                  marginRight: 1,
+                  transition: "all 0.3s",
+                  ":hover, :focus-visible": {
+                    background: theme.palette.background.hover,
+                    boxShadow: `0px 0px 20px ${theme.palette.background.shadow}`,
+                  },
+                }}
+                onClick={handleClickShowPassword}
+                disableRipple
+              >
+                <VisibilityOffIcon
                   style={{
-                    background: ["xs", "sm"].includes(displaySize)
-                      ? "inherit"
-                      : theme.palette.background.default,
-                    transition: "all 0.3s ease-in-out",
-                    borderRadius: ["xs", "sm"].includes(displaySize) ? 0 : 15,
-                    // border: `1px solid ${theme.palette.divider}`,
-                    boxShadow: ["xs", "sm"].includes(displaySize)
-                      ? "0px 0px 0px"
-                      : `0px 0px 20px ${theme.palette.background.shadow}`,
-                    ...(displaySize === "xs"
-                      ? {
-                          paddingLeft: 20,
-                          paddingRight: 20,
-                          paddingTop: 20,
-                          paddingBottom: 30,
-                        }
-                      : displaySize === "sm"
-                      ? {
-                          paddingLeft: 50,
-                          paddingRight: 50,
-                          paddingTop: 50,
-                          paddingBottom: 30,
-                        }
-                      : {
-                          // lg and xl
-                          padding: 40,
-                          borderStyle: "solid",
-                          borderWidth: 1,
-                          borderColor: theme.palette.background.border,
-                        }),
+                    opacity: showPassword ? 1 : 0,
+                    transition: "all 0.3s",
+                    scale: "1.5",
+                    marginLeft: 1,
+                    marginTop: 1,
+                    color: theme.palette.text.secondary,
                   }}
-                >
-                  <TransitionGroup>
-                    {counter > 1 && (
-                      <Collapse>
-                        {" "}
-                        <div
-                          style={{
-                            height: 60,
-                            display: "flex",
-                            marginTop: 10,
-                            fontFamily: "roboto, sans",
-                            fontSize: 28,
-                            marginLeft: 12,
-                            fontWeight: 300,
-                            color: theme.palette.text.primary,
-                            transition: "all 0.3s",
-                          }}
-                        >
-                          Create your account
-                        </div>
-                      </Collapse>
-                    )}
-                    {counter > 1 && (
-                      <Collapse style={{ marginBottom: 17 }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            transition: "all 0.5s",
-                            flexDirection: ["xs", "sm"].includes(displaySize)
-                              ? "row"
-                              : "row",
-                            width: "100%",
-                            height: ["xs", "sm"].includes(displaySize)
-                              ? 92
-                              : 38,
-                          }}
-                        >
-                          <TextField
-                            name="firstName"
-                            label="First name"
-                            margin="dense"
-                            size="small"
-                            value={useForm.firstName.text}
-                            disabled={buttonStatus === "sending"}
-                            error={useForm.firstName.error}
-                            onChange={useForm.set}
-                            onBlur={useForm.set}
-                            onFocus={useForm.set}
-                            style={{
-                              width: ["xs", "sm"].includes(displaySize)
-                                ? "100%"
-                                : 178,
-                              height: 30,
-                              marginBottom: ["xs", "sm"].includes(displaySize)
-                                ? 17
-                                : 0,
-                            }}
-                            inputProps={{ maxLength: 12 }}
-                          />
-                          <TextField
-                            name="lastName"
-                            label="Last name"
-                            margin="dense"
-                            size="small"
-                            value={useForm.lastName.text}
-                            disabled={buttonStatus === "sending"}
-                            error={useForm.lastName.error}
-                            onChange={useForm.set}
-                            onBlur={useForm.set}
-                            onFocus={useForm.set}
-                            style={{
-                              width: ["xs", "sm"].includes(displaySize)
-                                ? `calc(100% - ${
-                                    displaySize === "xs" ? "40" : "100"
-                                  }px)`
-                                : 178,
-                              height: 30,
-                              position: "absolute",
-                              right: ["xs", "sm"].includes(displaySize)
-                                ? "auto"
-                                : 40,
-                              transition: "all 0.3s ease-in-out",
-                              marginTop: ["xs", "sm"].includes(displaySize)
-                                ? 62.5
-                                : 8,
-                            }}
-                            inputProps={{ maxLength: 12 }}
-                          />
-                        </div>
-                      </Collapse>
-                    )}
-                    {counter > 1 && (
-                      <Collapse>
-                        <TextField
-                          name="userName"
-                          label="Username"
-                          margin="dense"
-                          size="small"
-                          value={useForm.userName.text}
-                          required
-                          disabled={buttonStatus === "sending"}
-                          error={useForm.userName.error}
-                          onChange={useForm.set}
-                          onBlur={useForm.set}
-                          onFocus={useForm.set}
-                          style={{
-                            width: "100%",
-                            marginBottom: 0,
-                          }}
-                          inputProps={{ maxLength: 30 }}
-                        />
-                      </Collapse>
-                    )}
-                    {useForm.userName.error && (
-                      // todo!: make function for this monstrosity vv
-                      <Collapse style={errorMessage}>
-                        {useForm.userName.text.length < 2
-                          ? "Enter your username"
-                          : !/^[A-Za-z]$/.test(useForm.userName.text.charAt(0))
-                          ? "Username must start with a letter"
-                          : /^.* .*$/.test(useForm.userName.text)
-                          ? "No spaces allowed"
-                          : !/^[A-Za-z_\d]*$/.test(useForm.userName.text)
-                          ? "The only symbol you can use is underscore"
-                          : "Username must be alphanumeric"}
-                      </Collapse>
-                    )}
-                    {counter > 2 && (
-                      <Collapse>
-                        <div style={{ display: "flex", flexDirection: "row" }}>
-                          <TextField
-                            name="password"
-                            label="Password"
-                            margin="dense"
-                            size="small"
-                            required
-                            type={showPassword ? "text" : "password"}
-                            disabled={buttonStatus === "sending"}
-                            value={useForm.password.text}
-                            onChange={useForm.set}
-                            error={useForm.password.error}
-                            onBlur={useForm.set}
-                            onFocus={useForm.set}
-                            style={{
-                              width: "100%",
-                              marginTop: 15,
-                              marginBottom: 0,
-                            }}
-                            inputProps={{ maxLength: 100 }}
-                          />
-
-                          <IconButton
-                            aria-label="delete"
-                            style={{
-                              width: 70,
-                              backgroundColor: "transparent",
-                              scale: "1.4",
-                              marginTop: "auto",
-                              marginLeft: "auto",
-                              marginRight: "auto",
-                              // background:'red'
-                            }}
-                            onClick={handleClickShowPassword}
-                            disableRipple
-                          >
-                            <VisibilityOffIcon
-                              style={{
-                                visibility: !showPassword
-                                  ? "hidden"
-                                  : "visible",
-                                opacity: showPassword ? 1 : 0,
-                                transition: "all 0.3s",
-                                color: theme.palette.text.secondary,
-                              }}
-                            />
-                            <VisibilityIcon
-                              style={{
-                                visibility: !showPassword
-                                  ? "visible"
-                                  : "hidden",
-                                opacity: showPassword ? 0 : 1,
-                                position: "absolute",
-                                transition: "all 0.3s",
-                                color: theme.palette.text.secondary,
-                              }}
-                            />
-                          </IconButton>
-                        </div>
-                      </Collapse>
-                    )}
-                    {useForm.password.error && (
-                      <Collapse style={errorMessage}>
-                        Use 8 or more characters
-                      </Collapse>
-                    )}
-                    {counter > 4 && (
-                      <Collapse>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            paddingTop: 35,
-                          }}
-                        >
-                          <MuiButton
-                            href="/login"
-                            variant="text"
-                            theme={theme}
-                            style={{
-                              marginTop: 15,
-                              width: 140,
-                              fontSize: 16,
-                              // fontWeight: 500,
-                              textTransform: "none",
-                              color: theme.palette.text.accent,
-                            }}
-                          >
-                            Sign in instead
-                          </MuiButton>
-                          <Button
-                            color={buttonColor}
-                            alert={alertStatus}
-                            buttonStatus={buttonStatus}
-                            alertMsg={alertMsg}
-                            onClick={handleSubmitForm}
-                            text="Sign up"
-                          />
-                        </div>
-                      </Collapse>
-                    )}
-                  </TransitionGroup>
-                </Box>
-              </Collapse>
-              {alertStatus && (
-                <Collapse
-                  style={{ position: "relative", zIndex: 0, width: "100%" }}
-                >
-                  <Alert
-                    severity={alertStatus}
-                    message={alertMsg}
-                    displaySize={displaySize}
-                  />
-                </Collapse>
-              )}
-            </TransitionGroup>
-          </Box>
-        </div>
+                />
+                <VisibilityIcon
+                  style={{
+                    marginLeft: 1,
+                    marginTop: 1,
+                    scale: "1.5",
+                    opacity: showPassword ? 0 : 1,
+                    position: "absolute",
+                    transition: "all 0.3s",
+                    color: theme.palette.text.secondary,
+                  }}
+                />
+              </IconButton>
+            </div>
+            <Collapse in={useForm.password.error} style={errorMessage}>
+              Use 8 or more characters
+            </Collapse>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                paddingTop: 35,
+              }}
+            >
+              <MuiButton
+                variant="text"
+                theme={theme}
+                onClick={() => {
+                  setShowComponent(false);
+                  setAlertStatus("false")
+                  setTimeout(() => router.push("/login"), 300);
+                }}
+                style={{
+                  marginTop: 15,
+                  width: 140,
+                  fontSize: 16,
+                  // fontWeight: 500,
+                  textTransform: "none",
+                  color: theme.palette.text.accent,
+                }}
+              >
+                Sign in instead
+              </MuiButton>
+              <Button
+                color={buttonColor}
+                alert={alertStatus}
+                buttonStatus={buttonStatus}
+                alertMsg={alertMsg}
+                onClick={handleSubmitForm}
+                text="Sign up"
+              />
+            </div>
+          </div>
+        </Box>
+        <TransitionGroup>
+          {alertStatus !== "false" && (
+            <Collapse
+              in={true}
+              style={{ position: "relative", zIndex: -1, width: "100%" }}
+            >
+              <Alert
+                severity={alertStatus}
+                message={alertMsg}
+                displaySize={displaySize}
+              />
+            </Collapse>
+          )}
+        </TransitionGroup>
       </div>
     </ThemeProvider>
   );

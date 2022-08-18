@@ -2,5 +2,9 @@ mutation Register($firstName: String!, $lastName: String!, $userName: String!, $
   register(userID: $userName, password: $password, firstName: $firstName, lastName: $lastName) {
     status
     message
+    user {
+      id
+      userID
+    }
   }
 }

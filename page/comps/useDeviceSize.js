@@ -15,10 +15,10 @@ const widthToSize = (width) => {
   } else {
     return "xl";
   }
-};
+}; 
 
 const useDeviceSize = () => {
-  const [size, setSize] = useState("xs");
+  const [size, setSize] = useState("md");
 
   const handleWindowResize = () => {
     setSize(widthToSize(window.innerWidth));

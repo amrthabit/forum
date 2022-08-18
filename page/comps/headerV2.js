@@ -1,44 +1,30 @@
-import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 import MenuIcon from "@mui/icons-material/Menu";
-import Button from "@mui/material/Button";
-import MenuItem from "@mui/material/MenuItem";
 import { ThemeProvider } from "@mui/material";
-import TransitionGroup from "react-transition-group/TransitionGroup";
+import AppBar from "@mui/material/AppBar";
+import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
-import Instagram from "@mui/icons-material/Instagram";
-import LinkedIn from "@mui/icons-material/LinkedIn";
-import GitHub from "@mui/icons-material/GitHub";
-import Email from "@mui/icons-material/Email";
-import Send from "@mui/icons-material/Send";
-import Link from "@mui/material/Link";
+import IconButton from "@mui/material/IconButton";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Typography from "@mui/material/Typography";
+import { withUrqlClient } from "next-urql";
+import { useRouter } from "next/router";
+import * as React from "react";
+import TransitionGroup from "react-transition-group/TransitionGroup";
+import { useLogoutMutation, useMeQuery } from "../src/generated/graphql";
+import { createUrqlClient } from "../utils/createUrqlClient";
+import isServer from "../utils/isServer";
+import MenuButton from "./menuButton";
 import useDeviceSize from "./useDeviceSize";
-import LightModeIcon from "@mui/icons-material/Brightness4";
-import DarkModeIcon from "@mui/icons-material/Brightness7";
-//todo: abstract sizing thing
-const pagesLeft = [
-  ["Play", "#experience"],
-  ["Leaderboard", "#projects"],
-  ["Events", "#skills"],
-];
 
-const pagesRight = (isLoggedIn) => {
-  if (isLoggedIn) {
-    return [
-      ["Sign In", "/login"],
-      ["Register", "/register"],
-    ];
-  } else {
-    return [
-      ["Sign Out", "#experience"],
-      ["Profile", "#projects"],
-    ];
-  }
-};
+// todo: abstract sizing thing
+const pagesLeft = [
+  ["Play", "#play"],
+  ["Leaderboard", "#leaderboard"],
+  ["Events", "#events"],
+];
 
 const HamburgerMenu = (props) => (
   <>
@@ -104,23 +90,49 @@ const HamburgerMenu = (props) => (
   </>
 );
 
-export default function MuiHeader(props) {
+function MuiHeader(props) {
   const theme = props.theme;
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const router = useRouter();
+  const [anchorNav, setAnchorNav] = React.useState(null);
+  const [anchorUser, setAnchorUser] = React.useState(null);
+  const [{ data, fetching }] = useMeQuery({
+    pause: isServer,
+  });
+  const [, logout] = useLogoutMutation();
+
+  const pagesRight = () => {
+    if (fetching || !data || !data.me) {
+      return [
+        ["Sign In", "/login", () => {}],
+        ["Register", "/register", () => {}],
+      ];
+    } else {
+      return [
+        [
+          "Sign Out",
+          "/",
+          () => {
+            logout();
+          },
+        ],
+        [data.me.userID.length > 8 ? data.me.userID.slice(0,7): data.me.userID, "#profile", () => {}],
+      ];
+    }
+  };
+
   const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
+    setAnchorNav(event.currentTarget);
   };
   const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
+    setAnchorUser(event.currentTarget);
   };
 
   const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+    setAnchorNav(null);
   };
 
   const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
+    setAnchorUser(null);
   };
 
   const [displaySize] = useDeviceSize();
@@ -132,9 +144,11 @@ export default function MuiHeader(props) {
           background: theme.palette.background.paper,
           color: theme.palette.text.primary,
           transition: "all 0.3s ease-in-out",
-          height: ["xs", "sm"].includes(displaySize) ? 40 : 60,
+          height: ["xs", "sm"].includes(displaySize) ? 40 : 50,
           width: "100%",
+          zIndex: "2"
         }}
+
       >
         <div
           id="header-flex-div"
@@ -158,8 +172,8 @@ export default function MuiHeader(props) {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              // background: "red",
               margin: ["xs", "sm"].includes(displaySize) ? 10 : 20,
+              marginRight: ["xs", "sm"].includes(displaySize) ? 10 : 0,
             }}
           >
             <Collapse
@@ -170,46 +184,36 @@ export default function MuiHeader(props) {
               <HamburgerMenu
                 handleOpenNavMenu={handleOpenNavMenu}
                 theme={theme}
-                anchorElNav={anchorElNav}
+                anchorElNav={anchorNav}
                 handleCloseNavMenu={handleCloseNavMenu}
               />
             </Collapse>
 
-            <div
-              id="name-container"
+            <MenuButton
+              theme={theme}
+              id="name"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              href="#home"
+              variant="text"
+              onClick={() => {
+                window.scrollTo({
+                  top: 0,
+                  behavior: "smooth",
+                });
+              }}
               style={{
-                fontSize: 20,
-                margin: "auto",
-                marginRight: 10,
-                whiteSpace: "nowrap",
                 color: theme.palette.text.primary,
-                transition: "inherit",
+                textDecoration: "none",
+                marginLeft: 0,
+                margin: "auto",
+                fontSize: 20,
+                padding: 1
               }}
             >
-              <Link
-                id="name"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                href="#home"
-                variant="text"
-                onClick={() => {
-                  window.scrollTo({
-                    top: 0,
-                    behavior: "smooth",
-                  });
-                }}
-                style={{
-                  color: theme.palette.text.primary,
-                  fontFamily: "inherit",
-                  textDecoration: "none",
-                  transition: "all 0.3s ease-in-out",
-                  marginLeft: 0,
-                }}
-              >
-                XOXO
-              </Link>
-            </div>
+              XOXO
+            </MenuButton>
             <Collapse
               component="div"
               in={["md", "lg", "xl"].includes(displaySize)}
@@ -218,24 +222,16 @@ export default function MuiHeader(props) {
                 transition: "all 0.3s",
                 margin: "auto",
                 height: "2.3em",
-                overflow: "hidden",
                 display: "flex",
                 flexDirection: "row",
+                flexWrap: "nowrap",
+                width: "20em",
               }}
             >
               {pagesLeft.map(([page, href]) => (
-                <Button
-                  id={page}
-                  key={page}
-                  href={href}
-                  sx={{
-                    color: theme.palette.text.primary,
-                    fontFamily: "inherit",
-                    transition: "all 0.3s",
-                  }}
-                >
+                <MenuButton id={page} theme={theme} key={page} href={href}>
                   {page}
-                </Button>
+                </MenuButton>
               ))}
             </Collapse>
           </div>
@@ -247,156 +243,84 @@ export default function MuiHeader(props) {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              // background: "red",
               margin: ["xs", "sm"].includes(displaySize) ? 10 : 20,
             }}
           >
             {
               // ["xl", "lg", "md"].includes(displaySize) &&
-              pagesRight(false).map(([page, href]) => (
+              pagesRight().map(([page, href, handler]) => (
                 <Collapse
                   key={page}
                   orientation="horizontal"
                   style={{ margin: "auto" }}
                 >
-                  <Button
+                  <MenuButton
+                    theme={theme}
                     key={page}
-                    href={href}
                     onClick={() => {
                       handleCloseNavMenu();
-                    }}
-                    sx={{
-                      color: theme.palette.text.primary,
-                      fontFamily: "inherit",
-                      whiteSpace: "noWrap",
+                      handler();
+                      router.push(href);
                     }}
                   >
                     {page}
-                  </Button>
+                  </MenuButton>
                 </Collapse>
               ))
-              // contactMenu.map(([icon, href]) => (
-              //   <Collapse
-              //     key={href}
-              //     orientation="horizontal"
-              //     style={{ margin: "auto", tranition: "inherit" }}
-              //   >
-              //     <IconButton
-              //       href={href}
-              //       // target="_blank"
-              //       key={icon.toString()}
-              //       onClick={(e) => {
-              //         handleCloseUserMenu();
-              //         if (href.startsWith("#")) {
-              //           e.preventDefault();
-              //           let element = document.getElementById(
-              //             href.substring(1)
-              //           );
-              //           element.scrollIntoView({
-              //             behavior: "smooth",
-              //             block: "start",
-              //           });
-              //         }
-              //       }}
-              //       sx={{
-              //         color: theme.palette.text.primary,
-              //         width: 40,
-              //         transition: "all 0.3s ease-in-out",
-              //       }}
-              //     >
-              //       {icon}
-              //     </IconButton>
-              //   </Collapse>
-              // ))
             }
-            {/* {["sm"].includes(displaySize) && (
-              <Collapse id="15" orientation="horizontal">
-                <IconButton
-                  size="large"
-                  aria-label="account of current user"
-                  aria-controls="menu-appbar-send"
-                  aria-haspopup="true"
-                  onClick={handleOpenUserMenu}
-                  sx={{
-                    color: theme.palette.text.primary,
-                    transition: "all 0.3s ease-in-out",
-                  }}
-                >
-                  <Send />
-                </IconButton>
-                <Menu
-                  id="menu-appbar-send"
-                  anchorEl={anchorElUser}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "left",
-                  }}
-                  keepMounted
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "left",
-                  }}
-                  open={Boolean(anchorElUser)}
-                  onClose={handleCloseUserMenu}
-                  sx={{
-                    display: { xs: "block", md: "none" },
-                  }}
-                  disableScrollLock={true}
-                >
-                  {contactMenu.map(([icon, href]) => (
-                    <IconButton
-                      key={href}
-                      href={href.startsWith("#") ? "" : href}
-                      onClick={(e) => {
-                        handleCloseUserMenu();
-                        if (href.startsWith("#")) {
-                          setTimeout(() => {
-                            e.preventDefault();
-                            let element = document.getElementById(
-                              href.substring(1)
-                            );
-                            element.scrollIntoView({
-                              behavior: "smooth",
-                              block: "start",
-                            });
-                          }, 10);
-                        }
-                      }}
-                      sx={{
-                        color: theme.palette.text.primary,
-                        width: 40,
-                        scale: 0.8,
-                        transition: "all 0.3s ease-in-out",
-                      }}
-                    >
-                      {icon}
-                    </IconButton>
-                  ))}
-                </Menu>
-              </Collapse>
-            )} */}
             <Collapse id="16" orientation="horizontal">
-              <Box
-                sx={{ display: "flex", transition: "all 0.3s", marginLeft: 1 }}
-                onClick={props.switchTheme}
+              <Button
+                disableRipple
+                onClick={theme.switchTheme}
+                sx={{
+                  display: "flex",
+                  transition: "all 0.1s ease-out",
+                  cursor: "pointer",
+                  borderRadius: "50%",
+                  padding: 1,
+                  margin: -1,
+                  marginLeft: -0.2,
+                  minWidth: 35,
+                  minHeight: 35,
+                  overFlow: "hidden",
+                  ":hover, :focus-visible": {
+                    background: theme.palette.background.hover,
+                    boxShadow: `0px 2px 10px ${theme.palette.background.shadow}`,
+                    borderRadius: "50%",
+                    "> *": {
+                      scale: "1.4",
+                    },
+                  },
+                  ":active": {
+                    transform: "rotate(45deg)",
+                  },
+                }}
               >
+                <DarkModeIcon
+                  sx={{
+                    scale: "1.2",
+                    transition: "all 0.3s",
+                    color: "white",
+                    opacity: props.theme.palette.mode == "light" ? 0 : 1,
+                    position: "absolute",
+
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    margin: "auto",
+                  }}
+                />
                 <LightModeIcon
                   sx={{
+                    scale: "1.2",
                     transition: "all 0.3s",
-                    color: theme.palette.text.primary,
-                    opacity: props.themeMode == "light" ? 0 : 0,
-                    position: "absolute",
-                    // todo: fix slow fade for these two ^^ vv
+                    color: "black",
+                    opacity: props.theme.palette.mode == "light" ? 1 : 0,
+                    margin: "auto",
                   }}
                 />
-                <DarkModeIcon
-                  xs={{
-                    transition: "all 0.3s ease-in-out",
-                    color: theme.palette.text.primary,
-                    opacity: props.themeMode == "light" ? 0 : 0,
-                  }}
-                />
-              </Box>
+              </Button>
             </Collapse>
           </TransitionGroup>
         </div>
@@ -404,3 +328,5 @@ export default function MuiHeader(props) {
     </ThemeProvider>
   );
 }
+
+export default withUrqlClient(createUrqlClient)(MuiHeader);

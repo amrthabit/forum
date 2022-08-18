@@ -19,6 +19,7 @@ export type LoginStatus = {
   __typename?: 'LoginStatus';
   message: Scalars['String'];
   status: Scalars['String'];
+  user?: Maybe<User>;
 };
 
 export type Mutation = {
@@ -27,6 +28,8 @@ export type Mutation = {
   deleteAllUsers: Array<User>;
   deletePost: Scalars['Boolean'];
   deleteUser: Scalars['Boolean'];
+  login: LoginStatus;
+  logout: Scalars['Boolean'];
   register: LoginStatus;
   updatePost?: Maybe<Post>;
   updateUser?: Maybe<User>;
@@ -45,6 +48,12 @@ export type MutationDeletePostArgs = {
 
 export type MutationDeleteUserArgs = {
   userID: Scalars['String'];
+};
+
+
+export type MutationLoginArgs = {
+  userID: Scalars['String'];
+  userPassword: Scalars['String'];
 };
 
 
@@ -79,18 +88,11 @@ export type Post = {
 export type Query = {
   __typename?: 'Query';
   hello: Scalars['String'];
-  login: LoginStatus;
   me?: Maybe<User>;
   post?: Maybe<Post>;
   posts: Array<Post>;
   user?: Maybe<User>;
   users: Array<User>;
-};
-
-
-export type QueryLoginArgs = {
-  userID: Scalars['String'];
-  userPassword: Scalars['String'];
 };
 
 
@@ -114,6 +116,19 @@ export type User = {
   userID: Scalars['String'];
 };
 
+export type LoginMutationVariables = Exact<{
+  userName: Scalars['String'];
+  password: Scalars['String'];
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginStatus', status: string, message: string, user?: { __typename?: 'User', id: number, userID: string } | null } };
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
+
 export type RegisterMutationVariables = Exact<{
   firstName: Scalars['String'];
   lastName: Scalars['String'];
@@ -122,9 +137,44 @@ export type RegisterMutationVariables = Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'LoginStatus', status: string, message: string } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'LoginStatus', status: string, message: string, user?: { __typename?: 'User', id: number, userID: string } | null } };
+
+export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, userID: string } | null };
+
+export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: number, title: string }> };
+
+
+export const LoginDocument = gql`
+    mutation Login($userName: String!, $password: String!) {
+  login(userID: $userName, userPassword: $password) {
+    status
+    message
+    user {
+      id
+      userID
+    }
+  }
+}
+    `;
+
+export function useLoginMutation() {
+  return Urql.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument);
+};
+export const LogoutDocument = gql`
+    mutation Logout {
+  logout
+}
+    `;
+
+export function useLogoutMutation() {
+  return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
+};
 export const RegisterDocument = gql`
     mutation Register($firstName: String!, $lastName: String!, $userName: String!, $password: String!) {
   register(
@@ -135,10 +185,38 @@ export const RegisterDocument = gql`
   ) {
     status
     message
+    user {
+      id
+      userID
+    }
   }
 }
     `;
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const MeDocument = gql`
+    query Me {
+  me {
+    id
+    userID
+  }
+}
+    `;
+
+export function useMeQuery(options?: Omit<Urql.UseQueryArgs<MeQueryVariables>, 'query'>) {
+  return Urql.useQuery<MeQuery, MeQueryVariables>({ query: MeDocument, ...options });
+};
+export const PostsDocument = gql`
+    query Posts {
+  posts {
+    id
+    title
+  }
+}
+    `;
+
+export function usePostsQuery(options?: Omit<Urql.UseQueryArgs<PostsQueryVariables>, 'query'>) {
+  return Urql.useQuery<PostsQuery, PostsQueryVariables>({ query: PostsDocument, ...options });
 };
