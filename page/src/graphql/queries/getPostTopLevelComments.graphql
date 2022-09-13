@@ -1,0 +1,5 @@
+query GetPostTopLevelComments($postID: Float!) {
+  getPostTopLevelComments(postID: $postID){
+    id
+  }
+}

@@ -1,0 +1,6 @@
+query GetPostTopComment($postID:Float!) {
+  getPostTopComment(postID: $postID){
+    id
+    content
+  }
+}

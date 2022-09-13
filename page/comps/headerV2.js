@@ -103,19 +103,25 @@ function MuiHeader(props) {
   const pagesRight = () => {
     if (fetching || !data || !data.me) {
       return [
-        ["Sign In", "/login", () => {}],
-        ["Register", "/register", () => {}],
+        ["Sign In", () => {router.push("/login")}],
+        ["Register", () => {router.push("/register")}],
       ];
     } else {
       return [
         [
           "Sign Out",
-          "/",
           () => {
             logout();
           },
         ],
-        [data.me.userID.length > 8 ? data.me.userID.slice(0,7): data.me.userID, "#profile", () => {}],
+        [
+          data.me.userID.length > 8
+            ? data.me.userID.slice(0, 7)
+            : data.me.userID,
+          () => {
+            router.push(`/user/${data.me.userID}`);
+          },
+        ],
       ];
     }
   };
@@ -139,16 +145,15 @@ function MuiHeader(props) {
   return (
     <ThemeProvider theme={theme}>
       <AppBar
-        position="static"
+        position="sticky"
         style={{
           background: theme.palette.background.paper,
           color: theme.palette.text.primary,
           transition: "all 0.3s ease-in-out",
           height: ["xs", "sm"].includes(displaySize) ? 40 : 50,
           width: "100%",
-          zIndex: "2"
+          zIndex: 10,
         }}
-
       >
         <div
           id="header-flex-div"
@@ -195,13 +200,9 @@ function MuiHeader(props) {
               aria-label="account of current user"
               aria-controls="menu-appbar"
               aria-haspopup="true"
-              href="#home"
               variant="text"
               onClick={() => {
-                window.scrollTo({
-                  top: 0,
-                  behavior: "smooth",
-                });
+                router.push("/");
               }}
               style={{
                 color: theme.palette.text.primary,
@@ -209,7 +210,7 @@ function MuiHeader(props) {
                 marginLeft: 0,
                 margin: "auto",
                 fontSize: 20,
-                padding: 1
+                padding: 1,
               }}
             >
               XOXO
@@ -248,7 +249,7 @@ function MuiHeader(props) {
           >
             {
               // ["xl", "lg", "md"].includes(displaySize) &&
-              pagesRight().map(([page, href, handler]) => (
+              pagesRight().map(([page, handler]) => (
                 <Collapse
                   key={page}
                   orientation="horizontal"
@@ -260,7 +261,6 @@ function MuiHeader(props) {
                     onClick={() => {
                       handleCloseNavMenu();
                       handler();
-                      router.push(href);
                     }}
                   >
                     {page}

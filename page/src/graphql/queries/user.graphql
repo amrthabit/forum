@@ -1,0 +1,9 @@
+query User ($id: Int!) {
+  user (id: $id) {
+    id
+    userID
+    firstName
+    lastName
+    createdAt
+  }
+}

@@ -1,0 +1,15 @@
+mutation CreateComment(
+  $rootPostID: Float!
+  $parentCommentID: Int!
+  $commenterID: Float!
+  $content: String!
+) {
+  createComment(
+    rootPostID: $rootPostID
+    parentCommentID: $parentCommentID
+    commenterID: $commenterID
+    content: $content
+  ) {
+    id
+  }
+}

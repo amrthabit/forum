@@ -1,28 +1,29 @@
 // todo!: split up component
 
 // make material ui form
-import React from "react";
-import { useState, useEffect } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import Button from "./button";
-import Alert from "./alert";
-import usernameHint from "../utils/registerUsernameHint";
-
 import {
-  IconButton,
   Box,
-  TextField,
-  Collapse,
-  ThemeProvider,
   Button as MuiButton,
+  Collapse,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  TextField,
+  ThemeProvider,
 } from "@mui/material";
-
-import "typeface-roboto";
-import useDeviceSize from "./useDeviceSize";
-import { useRegisterMutation } from "../src/generated/graphql";
-import { TransitionGroup } from "react-transition-group";
 import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { TransitionGroup } from "react-transition-group";
+import "typeface-roboto";
+import { useRegisterMutation } from "../src/generated/graphql";
+import Alert from "./alert";
+import Button from "./button";
+import UsernameHint from "../utils/registerUsernameHint";
+import { userAgentFromString } from "next/server";
 
 // style for small error shown below field
 const errorMessage = {
@@ -37,8 +38,8 @@ const errorMessage = {
 // returns form values and setters
 // takes error validation test
 function useField(test) {
-  const [text, set] = React.useState("");
-  const [error, setError] = React.useState(false);
+  const [text, set] = useState("");
+  const [error, setError] = useState(false);
   // use argument instead of text for instant update
   const validate = (value = text) => {
     const res = test(value);
@@ -87,6 +88,7 @@ export default function MuiForm(props) {
     firstName: useField(() => false),
     lastName: useField(() => false),
     userName: useField((value) => !/^([A-Za-z][A-Za-z_\d]+)$/.test(value)), // alphanumeric+`_` starting with letter
+    email: useField((value) => !/^.+@.+\..+$/.test(value)),
     password: useField((value) => value.length < 8),
     set: (e) => {
       useForm[e.target.name].set(e.target.value);
@@ -101,11 +103,16 @@ export default function MuiForm(props) {
       useForm.firstName.set("");
       useForm.lastName.set("");
       useForm.userName.set("");
+      useForm.email.set("");
       useForm.password.set("");
       useForm.password.setError(false);
     },
     validate: () => {
-      return [useForm.userName.validate(), useForm.password.validate()];
+      return [
+        useForm.userName.validate(),
+        useForm.email.validate(),
+        useForm.password.validate(),
+      ];
     },
   };
 
@@ -117,6 +124,7 @@ export default function MuiForm(props) {
       firstName: useForm.firstName.text,
       lastName: useForm.lastName.text,
       userName: useForm.userName.text,
+      email: useForm.email.text,
       password: useForm.password.text,
     });
 
@@ -137,11 +145,11 @@ export default function MuiForm(props) {
         setButtonColor("success");
         setAlertStatus("success");
         // keep alert message length at bay
-        if (useForm.userName.text.length < 20) {
+        if (useForm.userName.text.length < 13) {
           setAlertMsg(`${useForm.userName.text} signed up!`);
         } else {
           setAlertMsg(
-            `${useForm.userName.text.substring(0, 19)}... signed up!`
+            `${useForm.userName.text.substring(0, 13)}... signed up!`
           );
         }
         useForm.reset();
@@ -153,14 +161,14 @@ export default function MuiForm(props) {
       setButtonStatus("enabled");
     }, 200);
   };
-  
+
   // todo: refactor this function
   const handleSubmitForm = () => {
     setButtonStatus("disabled");
-    const [usernameErr, passwordErr] = useForm.validate();
+    const [usernameErr, emailErr, passwordErr] = useForm.validate();
 
     // required fields check
-    if (usernameErr || passwordErr) {
+    if (usernameErr || emailErr || passwordErr) {
       setButtonColor("error");
 
       // remove other message first before warning
@@ -188,11 +196,13 @@ export default function MuiForm(props) {
       submitForm();
     }
   };
+
   const handleEnter = (e) => {
     if (e.key === "Enter") {
       handleSubmitForm();
     }
   };
+
   return (
     <ThemeProvider theme={theme}>
       <div
@@ -210,7 +220,7 @@ export default function MuiForm(props) {
           noValidate
           autoComplete="off"
           style={{
-            transition: "all 0.3s ease-in-out",
+            transition: "all 0.3s",
             position: "relative",
             maxHeight: showComponent ? 1000 : 0,
 
@@ -334,71 +344,74 @@ export default function MuiForm(props) {
               onKeyDown={handleEnter}
             />
             <Collapse in={useForm.userName.error} style={errorMessage}>
-              {usernameHint(useForm.userName.text)}
+              <UsernameHint username={useForm.userName.text} />
             </Collapse>
-            <div style={{ display: "flex", flexDirection: "row" }}>
-              <TextField
+            <TextField
+              name="email"
+              label="Email"
+              margin="dense"
+              size="small"
+              value={useForm.email.text}
+              required
+              disabled={buttonStatus === "sending"}
+              error={useForm.email.error}
+              onChange={useForm.set}
+              onBlur={useForm.set}
+              onFocus={useForm.set}
+              style={{
+                width: "100%",
+                marginTop: 15,
+                marginBottom: 0,
+              }}
+              inputProps={{ maxLength: 50 }}
+              onKeyDown={handleEnter}
+            />
+            <Collapse in={useForm.email.error} style={errorMessage}>
+              Invalid Email
+            </Collapse>
+            <FormControl
+              variant="outlined"
+              margin="dense"
+              size="small"
+              required
+              error={useForm.password.error}
+              style={{
+                display: "flex",
+                flexDirection: "row",
+                width: "100%",
+                marginTop: 14,
+              }}
+            >
+              <InputLabel htmlFor="password-field">Password</InputLabel>
+              <OutlinedInput
+                id="password-field"
                 name="password"
                 label="Password"
-                margin="dense"
-                size="small"
-                required
                 type={showPassword ? "text" : "password"}
                 disabled={buttonStatus === "sending"}
                 value={useForm.password.text}
                 onChange={useForm.set}
-                error={useForm.password.error}
                 onBlur={useForm.set}
                 onFocus={useForm.set}
-                style={{
-                  width: "100%",
-                  marginTop: 15,
-                  marginBottom: 0,
-                }}
+                style={{ width: "100%" }}
                 inputProps={{ maxLength: 100 }}
                 onKeyDown={handleEnter}
+                endAdornment={
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle possword visibility"
+                      onClick={handleClickShowPassword}
+                    >
+                      {showPassword ? (
+                        <VisibilityOffIcon />
+                      ) : (
+                        <VisibilityIcon />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                }
               />
-              <IconButton
-                aria-label="delete"
-                sx={{
-                  width: 50,
-                  height: 50,
-                  marginTop: 1.3,
-                  marginBottom: "auto",
-                  marginLeft: 2,
-                  marginRight: 1,
-                  transition: "all 0.3s",
-                  ":hover, :focus-visible": {
-                    background: theme.palette.background.hover,
-                    boxShadow: `0px 0px 20px ${theme.palette.background.shadow}`,
-                  },
-                }}
-                onClick={handleClickShowPassword}
-                disableRipple
-              >
-                <VisibilityOffIcon
-                  style={{
-                    opacity: showPassword ? 1 : 0,
-                    transition: "all 0.3s",
-                    scale: "1.5",
-                    marginLeft: 1,
-                    marginTop: 1,
-                    color: theme.palette.text.secondary,
-                  }}
-                />
-                <VisibilityIcon
-                  style={{
-                    marginLeft: 1,
-                    marginTop: 1,
-                    scale: "1.5",
-                    opacity: showPassword ? 0 : 1,
-                    position: "absolute",
-                    transition: "all 0.3s",
-                    color: theme.palette.text.secondary,
-                  }}
-                />
-              </IconButton>
-            </div>
+            </FormControl>
             <Collapse in={useForm.password.error} style={errorMessage}>
               Use 8 or more characters
             </Collapse>
@@ -414,7 +427,7 @@ export default function MuiForm(props) {
                 theme={theme}
                 onClick={() => {
                   setShowComponent(false);
-                  setAlertStatus("false")
+                  setAlertStatus("false");
                   setTimeout(() => router.push("/login"), 300);
                 }}
                 style={{

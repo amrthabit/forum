@@ -1,0 +1,16 @@
+query GetCommentChildren ($commentID: Float!){
+  getCommentChildren(commentID:$commentID) {
+		id
+    createdAt
+    updatedAt
+    content
+    commenterID
+    upvoteCount
+    downvoteCount
+    viewCount
+    rootPostID
+    parentCommentID
+    level
+    isDeleted
+  }
+}

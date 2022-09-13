@@ -2,5 +2,12 @@ query Posts {
   posts {
     id
     title
+    content
+    posterID
+    upvoteCount
+    downvoteCount
+    viewCount
+    createdAt
+    updatedAt
   }
 }

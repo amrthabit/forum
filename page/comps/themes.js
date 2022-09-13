@@ -12,10 +12,11 @@ const darkTheme = createTheme({
     background: {
       default: "#171717",
       paper: "rgb(30, 30, 30)",
-      border: "rgb(18, 18, 18)",
-      shadow: "#000000ff",
-      hover: "#6b757f1e",
+      border: "rgb(81, 81, 81)",
+      shadow: "#0c0c0cff",
+      hover: "#444444ff",
       focus: "#bcbcbc",
+      commentArea: "#232323",
     },
     action: {
       selected: "rgb(200 0 0)",
@@ -24,20 +25,33 @@ const darkTheme = createTheme({
       primary: "rgb(220 220 220)",
       accent: "rgb(200 200 200)",
     },
+    scrollbar: {
+      track: "#aaaaaa",
+      thumb: "#868686",
+      thumbhover: "#a5a5a5",
+
+    },
   },
 });
 
-const lightTheme = createTheme({
+export const lightTheme = createTheme({
   palette: {
     mode: "light",
     text: {
       accent: "#1a73e8",
     },
     background: {
-      border: "#fff",
+      border: "#dadada",
+      paper: "#fcfcfc",
       shadow: "#40404047",
-      hover: "#fffffffe",
-      focus: "#bcbcbc",
+      hover: "#dce0e5fe",
+      focus: "#757575",
+      commentArea: "#ebebeb",
+    },
+    scrollbar: {
+      track: "#dbdbdb",
+      thumb: "#868686",
+      thumbhover: "#7b7b7b",
     },
   },
 });
@@ -74,16 +88,49 @@ export function useTheme() {
   return [theme];
 }
 
-export function GlobalCSS(props) {
+export function GlobalCSS({ theme, ...props }) {
   return (
     <Global
       styles={css`
         html {
-          background: ${props.theme.palette.background.default};
+          background: ${theme.palette.background.default};
           transition: all 0.3s;
+          scrollbar-color: #666 #201c29;
         }
         body {
           margin: 0;
+          border-color: rgba(0, 0, 0, 0.1);
+          transition: border-color 0.3s linear;
+          /* make this element do the scrolling */
+          overflow: auto;
+        }
+
+        // workaround to add transition to scrollbar
+        ::-webkit-scrollbar, 
+        ::-webkit-scrollbar-thumb,
+        ::-webkit-scrollbar-corner {
+          /* add border to act as background-color */
+          border-right-style: inset;
+          /* sum viewport dimensions to guarantee border will fill scrollbar */
+          border-right-width: calc(100vw + 100vh);
+          /* inherit border-color to inherit transitions */
+          border-color: inherit;
+        }
+
+        ::-webkit-scrollbar {
+          width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+          border-color: ${theme.palette.scrollbar.track};
+        }
+
+        ::-webkit-scrollbar-thumb {
+          border-color: ${theme.palette.scrollbar.thumb};
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+          border-color: ${theme.palette.scrollbar.thumbhover};
         }
       `}
     />

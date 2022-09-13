@@ -1,0 +1,13 @@
+query GetUserPosteds($posterID: Int!) {
+  getUserPosteds(posterID: $posterID) {
+    id
+    title
+    content
+    posterID
+    upvoteCount
+    downvoteCount
+    viewCount
+    createdAt
+    updatedAt
+  }
+}

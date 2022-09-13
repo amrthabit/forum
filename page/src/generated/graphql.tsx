@@ -15,6 +15,22 @@ export type Scalars = {
   Float: number;
 };
 
+export type Comment = {
+  __typename?: 'Comment';
+  commenterID: Scalars['Float'];
+  content: Scalars['String'];
+  createdAt: Scalars['String'];
+  downvoteCount: Scalars['Float'];
+  id: Scalars['Float'];
+  isDeleted: Scalars['Boolean'];
+  level: Scalars['Float'];
+  parentCommentID?: Maybe<Scalars['Float']>;
+  rootPostID: Scalars['Float'];
+  updatedAt: Scalars['String'];
+  upvoteCount: Scalars['Float'];
+  viewCount: Scalars['Float'];
+};
+
 export type LoginStatus = {
   __typename?: 'LoginStatus';
   message: Scalars['String'];
@@ -24,20 +40,66 @@ export type LoginStatus = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  castVote: Scalars['Boolean'];
+  changeVote: Scalars['Boolean'];
+  createComment: Comment;
   createPost: Post;
+  createPosted: Scalars['Boolean'];
+  deleteAllComments: Scalars['Boolean'];
+  deleteAllPosteds: Array<Posted>;
+  deleteAllPosts: Scalars['Boolean'];
   deleteAllUsers: Array<User>;
+  deleteComment: Scalars['Boolean'];
   deletePost: Scalars['Boolean'];
+  deletePosted: Scalars['Boolean'];
   deleteUser: Scalars['Boolean'];
+  forgotPassword: Scalars['Boolean'];
   login: LoginStatus;
   logout: Scalars['Boolean'];
   register: LoginStatus;
+  removeVote: Scalars['Boolean'];
   updatePost?: Maybe<Post>;
   updateUser?: Maybe<User>;
 };
 
 
+export type MutationCastVoteArgs = {
+  postID: Scalars['Int'];
+  voteType: Scalars['Int'];
+  voterID: Scalars['Int'];
+};
+
+
+export type MutationChangeVoteArgs = {
+  postID: Scalars['Int'];
+  voteType: Scalars['Int'];
+  voterID: Scalars['Int'];
+};
+
+
+export type MutationCreateCommentArgs = {
+  commenterID: Scalars['Float'];
+  content: Scalars['String'];
+  parentCommentID?: InputMaybe<Scalars['Int']>;
+  rootPostID: Scalars['Float'];
+};
+
+
 export type MutationCreatePostArgs = {
+  content: Scalars['String'];
+  posterID: Scalars['Float'];
   title: Scalars['String'];
+};
+
+
+export type MutationCreatePostedArgs = {
+  postID: Scalars['Float'];
+  posterID: Scalars['Float'];
+};
+
+
+export type MutationDeleteCommentArgs = {
+  id: Scalars['Float'];
 };
 
 
@@ -46,8 +108,18 @@ export type MutationDeletePostArgs = {
 };
 
 
+export type MutationDeletePostedArgs = {
+  postedID: Scalars['Float'];
+};
+
+
 export type MutationDeleteUserArgs = {
   userID: Scalars['String'];
+};
+
+
+export type MutationForgotPasswordArgs = {
+  email: Scalars['String'];
 };
 
 
@@ -58,10 +130,17 @@ export type MutationLoginArgs = {
 
 
 export type MutationRegisterArgs = {
+  email: Scalars['String'];
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   password: Scalars['String'];
   userID: Scalars['String'];
+};
+
+
+export type MutationRemoveVoteArgs = {
+  postID: Scalars['Int'];
+  voterID: Scalars['Int'];
 };
 
 
@@ -72,31 +151,108 @@ export type MutationUpdatePostArgs = {
 
 
 export type MutationUpdateUserArgs = {
-  newUserID: Scalars['String'];
-  newUserPassword: Scalars['String'];
+  updatedEmail: Scalars['String'];
+  updatedUserID: Scalars['String'];
+  updatedUserPassword: Scalars['String'];
   userID: Scalars['String'];
 };
 
 export type Post = {
   __typename?: 'Post';
+  content: Scalars['String'];
   createdAt: Scalars['String'];
+  downvoteCount: Scalars['Float'];
   id: Scalars['Float'];
+  posterID: Scalars['Float'];
   title: Scalars['String'];
   updatedAt: Scalars['String'];
+  upvoteCount: Scalars['Float'];
+  viewCount: Scalars['Float'];
+};
+
+export type Posted = {
+  __typename?: 'Posted';
+  id: Scalars['Float'];
+  postID: Scalars['Float'];
+  posterID: Scalars['Float'];
 };
 
 export type Query = {
   __typename?: 'Query';
+  comment?: Maybe<Comment>;
+  comments: Array<Comment>;
+  getAllVotes: Array<Vote>;
+  getCommentChildren: Array<Comment>;
+  getPostTopComment?: Maybe<Comment>;
+  getPostTopLevelComments: Array<Comment>;
+  getPostVotes: Array<Vote>;
+  getUserFromUsername?: Maybe<User>;
+  getUserPosteds: Array<Post>;
+  getUserVoteOnPost?: Maybe<Vote>;
+  getUserVotes: Array<Vote>;
   hello: Scalars['String'];
   me?: Maybe<User>;
   post?: Maybe<Post>;
+  posted?: Maybe<Posted>;
+  posteds: Array<Posted>;
   posts: Array<Post>;
   user?: Maybe<User>;
   users: Array<User>;
 };
 
 
+export type QueryCommentArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type QueryGetCommentChildrenArgs = {
+  commentID: Scalars['Float'];
+};
+
+
+export type QueryGetPostTopCommentArgs = {
+  postID: Scalars['Float'];
+};
+
+
+export type QueryGetPostTopLevelCommentsArgs = {
+  postID: Scalars['Float'];
+};
+
+
+export type QueryGetPostVotesArgs = {
+  postID: Scalars['Int'];
+};
+
+
+export type QueryGetUserFromUsernameArgs = {
+  username: Scalars['String'];
+};
+
+
+export type QueryGetUserPostedsArgs = {
+  posterID: Scalars['Int'];
+};
+
+
+export type QueryGetUserVoteOnPostArgs = {
+  postID: Scalars['Int'];
+  voterID: Scalars['Int'];
+};
+
+
+export type QueryGetUserVotesArgs = {
+  voterID: Scalars['Int'];
+};
+
+
 export type QueryPostArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type QueryPostedArgs = {
   id: Scalars['Int'];
 };
 
@@ -108,6 +264,7 @@ export type QueryUserArgs = {
 export type User = {
   __typename?: 'User';
   createdAt: Scalars['String'];
+  email: Scalars['String'];
   firstName: Scalars['String'];
   id: Scalars['Float'];
   lastName: Scalars['String'];
@@ -115,6 +272,65 @@ export type User = {
   updatedAt: Scalars['String'];
   userID: Scalars['String'];
 };
+
+export type Vote = {
+  __typename?: 'Vote';
+  postID: Scalars['Float'];
+  voteType: Scalars['Float'];
+  voterID: Scalars['Float'];
+};
+
+export type CastVoteMutationVariables = Exact<{
+  postID: Scalars['Int'];
+  voterID: Scalars['Int'];
+  voteType: Scalars['Int'];
+}>;
+
+
+export type CastVoteMutation = { __typename?: 'Mutation', castVote: boolean };
+
+export type ChangeVoteMutationVariables = Exact<{
+  postID: Scalars['Int'];
+  voterID: Scalars['Int'];
+  voteType: Scalars['Int'];
+}>;
+
+
+export type ChangeVoteMutation = { __typename?: 'Mutation', changeVote: boolean };
+
+export type CreateCommentMutationVariables = Exact<{
+  rootPostID: Scalars['Float'];
+  parentCommentID: Scalars['Int'];
+  commenterID: Scalars['Float'];
+  content: Scalars['String'];
+}>;
+
+
+export type CreateCommentMutation = { __typename?: 'Mutation', createComment: { __typename?: 'Comment', id: number } };
+
+export type CreatePostMutationVariables = Exact<{
+  title: Scalars['String'];
+  content: Scalars['String'];
+  posterID: Scalars['Float'];
+}>;
+
+
+export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: number } };
+
+export type CreatePostedMutationVariables = Exact<{
+  postID: Scalars['Float'];
+  posterID: Scalars['Float'];
+}>;
+
+
+export type CreatePostedMutation = { __typename?: 'Mutation', createPosted: boolean };
+
+export type DeletePostMutationVariables = Exact<{
+  postID: Scalars['Float'];
+}>;
+
+
+export type DeletePostMutation = { __typename?: 'Mutation', deletePost: boolean };
 
 export type LoginMutationVariables = Exact<{
   userName: Scalars['String'];
@@ -133,11 +349,91 @@ export type RegisterMutationVariables = Exact<{
   firstName: Scalars['String'];
   lastName: Scalars['String'];
   userName: Scalars['String'];
+  email: Scalars['String'];
   password: Scalars['String'];
 }>;
 
 
 export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'LoginStatus', status: string, message: string, user?: { __typename?: 'User', id: number, userID: string } | null } };
+
+export type RemoveVoteMutationVariables = Exact<{
+  postID: Scalars['Int'];
+  voterID: Scalars['Int'];
+}>;
+
+
+export type RemoveVoteMutation = { __typename?: 'Mutation', removeVote: boolean };
+
+export type GetCommentByIdQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type GetCommentByIdQuery = { __typename?: 'Query', comment?: { __typename?: 'Comment', id: number, createdAt: string, updatedAt: string, content: string, commenterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, rootPostID: number, parentCommentID?: number | null, level: number, isDeleted: boolean } | null };
+
+export type GetCommentChildrenQueryVariables = Exact<{
+  commentID: Scalars['Float'];
+}>;
+
+
+export type GetCommentChildrenQuery = { __typename?: 'Query', getCommentChildren: Array<{ __typename?: 'Comment', id: number, createdAt: string, updatedAt: string, content: string, commenterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, rootPostID: number, parentCommentID?: number | null, level: number, isDeleted: boolean }> };
+
+export type GetPostQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
+
+
+export type GetPostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number } | null };
+
+export type GetPostTopCommentQueryVariables = Exact<{
+  postID: Scalars['Float'];
+}>;
+
+
+export type GetPostTopCommentQuery = { __typename?: 'Query', getPostTopComment?: { __typename?: 'Comment', id: number, content: string } | null };
+
+export type GetPostTopLevelCommentsQueryVariables = Exact<{
+  postID: Scalars['Float'];
+}>;
+
+
+export type GetPostTopLevelCommentsQuery = { __typename?: 'Query', getPostTopLevelComments: Array<{ __typename?: 'Comment', id: number }> };
+
+export type GetPostVotesQueryVariables = Exact<{
+  postID: Scalars['Int'];
+}>;
+
+
+export type GetPostVotesQuery = { __typename?: 'Query', getPostVotes: Array<{ __typename?: 'Vote', voteType: number }> };
+
+export type GetUserFromUsernameQueryVariables = Exact<{
+  username: Scalars['String'];
+}>;
+
+
+export type GetUserFromUsernameQuery = { __typename?: 'Query', getUserFromUsername?: { __typename?: 'User', id: number, userID: string, firstName: string, lastName: string, createdAt: string } | null };
+
+export type GetUserPostedsQueryVariables = Exact<{
+  posterID: Scalars['Int'];
+}>;
+
+
+export type GetUserPostedsQuery = { __typename?: 'Query', getUserPosteds: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string }> };
+
+export type GetUserVoteOnPostQueryVariables = Exact<{
+  postID: Scalars['Int'];
+  voterID: Scalars['Int'];
+}>;
+
+
+export type GetUserVoteOnPostQuery = { __typename?: 'Query', getUserVoteOnPost?: { __typename?: 'Vote', voteType: number } | null };
+
+export type GetUserVotesQueryVariables = Exact<{
+  voterID: Scalars['Int'];
+}>;
+
+
+export type GetUserVotesQuery = { __typename?: 'Query', getUserVotes: Array<{ __typename?: 'Vote', voteType: number }> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -147,9 +443,79 @@ export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: nu
 export type PostsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: number, title: string }> };
+export type PostsQuery = { __typename?: 'Query', posts: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string }> };
+
+export type UserQueryVariables = Exact<{
+  id: Scalars['Int'];
+}>;
 
 
+export type UserQuery = { __typename?: 'Query', user?: { __typename?: 'User', id: number, userID: string, firstName: string, lastName: string, createdAt: string } | null };
+
+
+export const CastVoteDocument = gql`
+    mutation CastVote($postID: Int!, $voterID: Int!, $voteType: Int!) {
+  castVote(postID: $postID, voterID: $voterID, voteType: $voteType)
+}
+    `;
+
+export function useCastVoteMutation() {
+  return Urql.useMutation<CastVoteMutation, CastVoteMutationVariables>(CastVoteDocument);
+};
+export const ChangeVoteDocument = gql`
+    mutation ChangeVote($postID: Int!, $voterID: Int!, $voteType: Int!) {
+  changeVote(postID: $postID, voterID: $voterID, voteType: $voteType)
+}
+    `;
+
+export function useChangeVoteMutation() {
+  return Urql.useMutation<ChangeVoteMutation, ChangeVoteMutationVariables>(ChangeVoteDocument);
+};
+export const CreateCommentDocument = gql`
+    mutation CreateComment($rootPostID: Float!, $parentCommentID: Int!, $commenterID: Float!, $content: String!) {
+  createComment(
+    rootPostID: $rootPostID
+    parentCommentID: $parentCommentID
+    commenterID: $commenterID
+    content: $content
+  ) {
+    id
+  }
+}
+    `;
+
+export function useCreateCommentMutation() {
+  return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
+};
+export const CreatePostDocument = gql`
+    mutation CreatePost($title: String!, $content: String!, $posterID: Float!) {
+  createPost(title: $title, content: $content, posterID: $posterID) {
+    id
+  }
+}
+    `;
+
+export function useCreatePostMutation() {
+  return Urql.useMutation<CreatePostMutation, CreatePostMutationVariables>(CreatePostDocument);
+};
+export const CreatePostedDocument = gql`
+    mutation CreatePosted($postID: Float!, $posterID: Float!) {
+  createPosted(postID: $postID, posterID: $posterID)
+}
+    `;
+
+export function useCreatePostedMutation() {
+  return Urql.useMutation<CreatePostedMutation, CreatePostedMutationVariables>(CreatePostedDocument);
+};
+export const DeletePostDocument = gql`
+    mutation DeletePost($postID: Float!) {
+  deletePost(id: $postID)
+}
+    `;
+
+export function useDeletePostMutation() {
+  return Urql.useMutation<DeletePostMutation, DeletePostMutationVariables>(DeletePostDocument);
+};
 export const LoginDocument = gql`
     mutation Login($userName: String!, $password: String!) {
   login(userID: $userName, userPassword: $password) {
@@ -176,9 +542,10 @@ export function useLogoutMutation() {
   return Urql.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument);
 };
 export const RegisterDocument = gql`
-    mutation Register($firstName: String!, $lastName: String!, $userName: String!, $password: String!) {
+    mutation Register($firstName: String!, $lastName: String!, $userName: String!, $email: String!, $password: String!) {
   register(
     userID: $userName
+    email: $email
     password: $password
     firstName: $firstName
     lastName: $lastName
@@ -195,6 +562,168 @@ export const RegisterDocument = gql`
 
 export function useRegisterMutation() {
   return Urql.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument);
+};
+export const RemoveVoteDocument = gql`
+    mutation RemoveVote($postID: Int!, $voterID: Int!) {
+  removeVote(postID: $postID, voterID: $voterID)
+}
+    `;
+
+export function useRemoveVoteMutation() {
+  return Urql.useMutation<RemoveVoteMutation, RemoveVoteMutationVariables>(RemoveVoteDocument);
+};
+export const GetCommentByIdDocument = gql`
+    query GetCommentByID($id: Int!) {
+  comment(id: $id) {
+    id
+    createdAt
+    updatedAt
+    content
+    commenterID
+    upvoteCount
+    downvoteCount
+    viewCount
+    rootPostID
+    parentCommentID
+    level
+    isDeleted
+  }
+}
+    `;
+
+export function useGetCommentByIdQuery(options: Omit<Urql.UseQueryArgs<GetCommentByIdQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetCommentByIdQuery, GetCommentByIdQueryVariables>({ query: GetCommentByIdDocument, ...options });
+};
+export const GetCommentChildrenDocument = gql`
+    query GetCommentChildren($commentID: Float!) {
+  getCommentChildren(commentID: $commentID) {
+    id
+    createdAt
+    updatedAt
+    content
+    commenterID
+    upvoteCount
+    downvoteCount
+    viewCount
+    rootPostID
+    parentCommentID
+    level
+    isDeleted
+  }
+}
+    `;
+
+export function useGetCommentChildrenQuery(options: Omit<Urql.UseQueryArgs<GetCommentChildrenQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetCommentChildrenQuery, GetCommentChildrenQueryVariables>({ query: GetCommentChildrenDocument, ...options });
+};
+export const GetPostDocument = gql`
+    query GetPost($id: Int!) {
+  post(id: $id) {
+    id
+    createdAt
+    updatedAt
+    title
+    content
+    posterID
+    upvoteCount
+    downvoteCount
+    viewCount
+  }
+}
+    `;
+
+export function useGetPostQuery(options: Omit<Urql.UseQueryArgs<GetPostQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetPostQuery, GetPostQueryVariables>({ query: GetPostDocument, ...options });
+};
+export const GetPostTopCommentDocument = gql`
+    query GetPostTopComment($postID: Float!) {
+  getPostTopComment(postID: $postID) {
+    id
+    content
+  }
+}
+    `;
+
+export function useGetPostTopCommentQuery(options: Omit<Urql.UseQueryArgs<GetPostTopCommentQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetPostTopCommentQuery, GetPostTopCommentQueryVariables>({ query: GetPostTopCommentDocument, ...options });
+};
+export const GetPostTopLevelCommentsDocument = gql`
+    query GetPostTopLevelComments($postID: Float!) {
+  getPostTopLevelComments(postID: $postID) {
+    id
+  }
+}
+    `;
+
+export function useGetPostTopLevelCommentsQuery(options: Omit<Urql.UseQueryArgs<GetPostTopLevelCommentsQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetPostTopLevelCommentsQuery, GetPostTopLevelCommentsQueryVariables>({ query: GetPostTopLevelCommentsDocument, ...options });
+};
+export const GetPostVotesDocument = gql`
+    query GetPostVotes($postID: Int!) {
+  getPostVotes(postID: $postID) {
+    voteType
+  }
+}
+    `;
+
+export function useGetPostVotesQuery(options: Omit<Urql.UseQueryArgs<GetPostVotesQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetPostVotesQuery, GetPostVotesQueryVariables>({ query: GetPostVotesDocument, ...options });
+};
+export const GetUserFromUsernameDocument = gql`
+    query GetUserFromUsername($username: String!) {
+  getUserFromUsername(username: $username) {
+    id
+    userID
+    firstName
+    lastName
+    createdAt
+  }
+}
+    `;
+
+export function useGetUserFromUsernameQuery(options: Omit<Urql.UseQueryArgs<GetUserFromUsernameQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetUserFromUsernameQuery, GetUserFromUsernameQueryVariables>({ query: GetUserFromUsernameDocument, ...options });
+};
+export const GetUserPostedsDocument = gql`
+    query GetUserPosteds($posterID: Int!) {
+  getUserPosteds(posterID: $posterID) {
+    id
+    title
+    content
+    posterID
+    upvoteCount
+    downvoteCount
+    viewCount
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+export function useGetUserPostedsQuery(options: Omit<Urql.UseQueryArgs<GetUserPostedsQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetUserPostedsQuery, GetUserPostedsQueryVariables>({ query: GetUserPostedsDocument, ...options });
+};
+export const GetUserVoteOnPostDocument = gql`
+    query GetUserVoteOnPost($postID: Int!, $voterID: Int!) {
+  getUserVoteOnPost(postID: $postID, voterID: $voterID) {
+    voteType
+  }
+}
+    `;
+
+export function useGetUserVoteOnPostQuery(options: Omit<Urql.UseQueryArgs<GetUserVoteOnPostQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetUserVoteOnPostQuery, GetUserVoteOnPostQueryVariables>({ query: GetUserVoteOnPostDocument, ...options });
+};
+export const GetUserVotesDocument = gql`
+    query GetUserVotes($voterID: Int!) {
+  getUserVotes(voterID: $voterID) {
+    voteType
+  }
+}
+    `;
+
+export function useGetUserVotesQuery(options: Omit<Urql.UseQueryArgs<GetUserVotesQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetUserVotesQuery, GetUserVotesQueryVariables>({ query: GetUserVotesDocument, ...options });
 };
 export const MeDocument = gql`
     query Me {
@@ -213,10 +742,32 @@ export const PostsDocument = gql`
   posts {
     id
     title
+    content
+    posterID
+    upvoteCount
+    downvoteCount
+    viewCount
+    createdAt
+    updatedAt
   }
 }
     `;
 
 export function usePostsQuery(options?: Omit<Urql.UseQueryArgs<PostsQueryVariables>, 'query'>) {
   return Urql.useQuery<PostsQuery, PostsQueryVariables>({ query: PostsDocument, ...options });
+};
+export const UserDocument = gql`
+    query User($id: Int!) {
+  user(id: $id) {
+    id
+    userID
+    firstName
+    lastName
+    createdAt
+  }
+}
+    `;
+
+export function useUserQuery(options: Omit<Urql.UseQueryArgs<UserQueryVariables>, 'query'>) {
+  return Urql.useQuery<UserQuery, UserQueryVariables>({ query: UserDocument, ...options });
 };

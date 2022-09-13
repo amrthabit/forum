@@ -1,5 +1,4 @@
-import { ThemeProvider } from "@mui/material";
-import { useMemo } from "react";
+import { CssBaseline, ThemeProvider } from "@mui/material";
 import Header from "../comps/headerV2";
 import { GlobalCSS, useTheme } from "../comps/themes";
 import "../styles/globals.css";

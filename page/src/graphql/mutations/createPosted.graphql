@@ -1,0 +1,3 @@
+mutation CreatePosted($postID: Float!, $posterID: Float!) {
+  createPosted(postID: $postID, posterID: $posterID)
+}

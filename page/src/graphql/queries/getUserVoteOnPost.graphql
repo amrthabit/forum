@@ -1,0 +1,5 @@
+query GetUserVoteOnPost($postID: Int!, $voterID:Int!){
+  getUserVoteOnPost(postID: $postID, voterID:$voterID) {
+    voteType
+  }
+}

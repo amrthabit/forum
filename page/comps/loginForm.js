@@ -139,11 +139,11 @@ export default function LoginForm(props) {
         setButtonColor("success");
         setAlertStatus("success");
         // keep alert message length at bay
-        if (useForm.userName.text.length < 20) {
+        if (useForm.userName.text.length < 13) {
           setAlertMsg(`${useForm.userName.text} logged in!`);
         } else {
           setAlertMsg(
-            `${useForm.userName.text.substring(0, 19)}... logged in!`
+            `${useForm.userName.text.substring(0, 13)}... logged in!`
           );
         }
         useForm.reset();
@@ -252,9 +252,8 @@ export default function LoginForm(props) {
           }}
         >
           <LinearProgress
-            hidden={true}
-            variant="determinate"
             value={progress}
+            variant="determinate"
             sx={{
               position: "absolute",
               top: 0,
@@ -288,7 +287,7 @@ export default function LoginForm(props) {
             size="small"
             value={useForm.userName.text}
             required
-            disabled={buttonStatus === "sending"}
+            disabled={buttonStatus === "sending" || showProgress}
             error={useForm.userName.error}
             onChange={useForm.set}
             onBlur={useForm.set}
@@ -311,7 +310,7 @@ export default function LoginForm(props) {
               size="small"
               required
               type={showPassword ? "text" : "password"}
-              disabled={buttonStatus === "sending"}
+              disabled={buttonStatus === "sending" || showProgress}
               value={useForm.password.text}
               onChange={useForm.set}
               error={useForm.password.error}

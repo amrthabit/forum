@@ -1,6 +1,5 @@
-import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
-import { Field, ObjectType } from "type-graphql";
-import { User } from "./User";
+import { ArrayType, Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import { Field, Float, ObjectType } from "type-graphql";
 
 @ObjectType()
 @Entity()
@@ -20,14 +19,14 @@ export class Post {
   @Field()
   @Property({ type: "text" })
   title!: string;
- 
+
   @Field()
   @Property({ type: "text" })
-  content?: string;
+  content!: string;
 
-  @Field(() => User)
-  @Property({ type: User})
-  poster!: User;
+  @Field()
+  @Property()
+  posterID!: number;
 
   @Field()
   @Property()
@@ -36,10 +35,9 @@ export class Post {
   @Field()
   @Property()
   downvoteCount!: number;
-  
-  @Field()
-  @Property()
-  viewCount!: number;
 
+  @Field()
+  @Property()  
+  viewCount!: number;
 
 }

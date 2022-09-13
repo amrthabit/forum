@@ -1,34 +1,45 @@
+import { EntityManager } from "@mikro-orm/postgresql";
+import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { Post } from "../entities/Post";
 import { MyContext } from "../types";
-import { Resolver, Query, Ctx, Int, Arg, Mutation } from "type-graphql";
 
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  posts(@Ctx() { em }: MyContext) {
-    return em.find(Post, {});
+  async posts(@Ctx() { em }: MyContext) {
+    return await em.find(Post, {});
   }
 
   @Query(() => Post, { nullable: true })
-  post(@Arg("id", () => Int) id: number, @Ctx() { em }: MyContext) {
-    return em.findOne(Post, { id });
+  async post(@Arg("id", () => Int) id: number, @Ctx() { em }: MyContext) {
+    return await em.findOne(Post, { id });
   }
 
   @Mutation(() => Post)
   async createPost(
     @Arg("title") title: string,
     @Arg("content") content: string,
+    @Arg("posterID") posterID: number,
     @Ctx() { em }: MyContext
   ) {
-    const post = em.create(Post, {
-      title,
-      content,
-      upvoteCount: 0,
-      downvoteCount: 0,
-      viewCount: 0,
-    } as any);
-    
-    await em.persistAndFlush(post);
+    const response = await (em as EntityManager)
+      .createQueryBuilder(Post)
+      .getKnexQuery()
+      .insert({
+        // graphql changes casing
+        // knex doesn't adapt
+        title,
+        content,
+        poster_id: posterID,
+        upvote_count: 0,
+        downvote_count: 0,
+        view_count: 0,
+        created_at: new Date(),
+        updated_at: new Date(),
+      })
+      .returning("*");
+
+    const post = response[0];
     return post;
   }
 

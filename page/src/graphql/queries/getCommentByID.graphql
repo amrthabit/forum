@@ -1,0 +1,16 @@
+query GetCommentByID($id: Int!){
+  comment(id:$id){
+    id
+    createdAt
+    updatedAt
+    content
+    commenterID
+    upvoteCount
+    downvoteCount
+    viewCount
+    rootPostID
+    parentCommentID
+    level
+    isDeleted
+  }
+}

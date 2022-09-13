@@ -35,6 +35,135 @@
           "length": 6,
           "mappedType": "datetime"
         },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
+        "commenter_id": {
+          "name": "commenter_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "upvote_count": {
+          "name": "upvote_count",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "downvote_count": {
+          "name": "downvote_count",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "view_count": {
+          "name": "view_count",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "root_post_id": {
+          "name": "root_post_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "parent_comment_id": {
+          "name": "parent_comment_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "mappedType": "integer"
+        },
+        "level": {
+          "name": "level",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "is_deleted": {
+          "name": "is_deleted",
+          "type": "boolean",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "boolean"
+        }
+      },
+      "name": "comment",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "comment_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(0)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(0)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 6,
+          "mappedType": "datetime"
+        },
         "title": {
           "name": "title",
           "type": "text",
@@ -53,14 +182,14 @@
           "nullable": false,
           "mappedType": "text"
         },
-        "poster": {
-          "name": "poster",
-          "type": "varchar(255)",
+        "poster_id": {
+          "name": "poster_id",
+          "type": "int",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "mappedType": "string"
+          "mappedType": "integer"
         },
         "upvote_count": {
           "name": "upvote_count",
@@ -117,8 +246,63 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "post_id": {
+          "name": "post_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "poster_id": {
+          "name": "poster_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        }
+      },
+      "name": "posted",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "posted_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
         "user_id": {
           "name": "user_id",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "text"
+        },
+        "email": {
+          "name": "email",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -187,11 +371,67 @@
           "unique": true
         },
         {
+          "columnNames": [
+            "email"
+          ],
+          "composite": false,
+          "keyName": "user_email_unique",
+          "primary": false,
+          "unique": true
+        },
+        {
           "keyName": "user_pkey",
           "columnNames": [
             "id"
           ],
           "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "voter_id": {
+          "name": "voter_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "post_id": {
+          "name": "post_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "vote_type": {
+          "name": "vote_type",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        }
+      },
+      "name": "vote",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "vote_pkey",
+          "columnNames": [
+            "voter_id",
+            "post_id"
+          ],
+          "composite": true,
           "primary": true,
           "unique": true
         }

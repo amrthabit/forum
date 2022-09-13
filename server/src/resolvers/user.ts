@@ -1,19 +1,15 @@
-import argon2 from "argon2";
-import { MyContext } from "../types";
-import { User } from "../entities/User";
-import {
-  Resolver,
-  Query,
-  Ctx,
-  Int,
-  Arg,
-  Mutation,
-  ObjectType,
-  Field,
-} from "type-graphql";
 import { EntityManager } from "@mikro-orm/postgresql";
-import { COOKIE_NAME } from "../constants";
-
+import argon2 from "argon2";
+import nodemailer from "nodemailer";
+import {
+  Arg, Ctx, Field, Int, Mutation,
+  ObjectType, Query, Resolver
+} from "type-graphql";
+import { v4 } from "uuid";
+import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from "../constants";
+import { User } from "../entities/User";
+import { MyContext } from "../types";
+ 
 @ObjectType()
 class LoginStatus {
   @Field()
@@ -35,7 +31,7 @@ export class UserResolver {
     @Ctx()
     { em }: MyContext
   ) {
-    return em.findOne(User, { id });
+    return await em.findOne(User, { id });
   }
 
   @Query(() => [User])
@@ -43,7 +39,7 @@ export class UserResolver {
     @Ctx()
     { em }: MyContext
   ) {
-    return em.find(User, {});
+    return await em.find(User, {});
   }
 
   // TODO!: don't forget to remove this from production /// /// /// /// /// /// /// /// ///
@@ -59,12 +55,14 @@ export class UserResolver {
   @Mutation(() => LoginStatus)
   async register(
     @Arg("userID") newUserID: string,
+    @Arg("email") newEmail: string,
     @Arg("password") newUserPassword: string,
     @Arg("firstName") newUserFirstName: string,
     @Arg("lastName") newUserLastName: string,
     @Ctx() { em, req }: MyContext
   ) {
     newUserID = newUserID.toLowerCase();
+    newEmail = newEmail.toLowerCase();
     const userAlreadyExists = await em.findOne(User, {
       userID: newUserID.toLowerCase(),
     });
@@ -72,6 +70,16 @@ export class UserResolver {
       return {
         status: "failed",
         message: `Username ${userAlreadyExists.userID} already exists`,
+        user: null,
+      };
+    }
+    const emailAlreadyExists = await em.findOne(User, {
+      email: newEmail.toLowerCase(),
+    });
+    if (emailAlreadyExists) {
+      return {
+        status: "failed",
+        message: `Username ${emailAlreadyExists.email} already exists`,
         user: null,
       };
     }
@@ -85,6 +93,7 @@ export class UserResolver {
         // graphql changes casing
         // knex doesn't adapt
         user_id: newUserID,
+        email: newEmail,
         password: hashedPassword,
         first_name: newUserFirstName,
         last_name: newUserLastName,
@@ -102,7 +111,6 @@ export class UserResolver {
       message: "user created successfully",
       user: user as User,
     };
-    console.log(res);
     return res;
   }
 
@@ -111,28 +119,37 @@ export class UserResolver {
     @Arg("userID")
     userID: string,
 
-    @Arg("newUserID")
-    newUserID: string,
+    @Arg("updatedUserID")
+    updatedUserID: string,
 
-    @Arg("newUserPassword")
-    newUserPassword: string,
+    @Arg("updatedEmail")
+    updatedEmail: string,
+
+    // @Arg("password")
+    // password: string,
+
+    @Arg("updatedUserPassword")
+    updatedUserPassword: string,
 
     @Ctx()
     { em }: MyContext
   ) {
     userID = userID.toLowerCase();
+    updatedUserID = updatedUserID.toLowerCase();
+    updatedEmail = updatedEmail.toLowerCase();
+
     const user = await em.findOne(User, { userID: userID });
     if (!user) {
       return null;
     }
-    if (typeof newUserID === "undefined") {
+    if (typeof updatedUserID === "undefined") {
       return user;
     }
-    if (typeof newUserPassword === "undefined") {
+    if (typeof updatedUserPassword === "undefined") {
       return user;
     }
-    user.userID = newUserID;
-    user.password = await argon2.hash(newUserPassword);
+    user.userID = updatedUserID;
+    user.password = await argon2.hash(updatedUserPassword);
     em.persistAndFlush(user);
     return user;
   }
@@ -145,6 +162,51 @@ export class UserResolver {
       return false;
     }
     await em.nativeDelete(User, { userID: userID });
+    return true;
+  }
+
+  @Mutation(() => Boolean)
+  async forgotPassword(
+    @Arg("email") email: string,
+    @Ctx() { em, redis }: MyContext
+  ) {
+    const user = await em.findOne(User, { email });
+    if (!user) {
+      return true;
+    }
+
+    const token = v4();
+
+    await redis.set(
+      FORGOT_PASSWORD_PREFIX + token,
+      user.id,
+      "EX",
+      1000 * 60 * 60
+    ); // expire after 1 hour
+    let testAccount = await nodemailer.createTestAccount();
+
+    // create reusable transporter object using the default SMTP transport
+    let transporter = nodemailer.createTransport({
+      host: "smtp.ethereal.email",
+      port: 587,
+      secure: false, // true for 465, false for other ports
+      auth: {
+        user: testAccount.user, // generated ethereal user
+        pass: testAccount.pass, // generated ethereal password
+      },
+    });
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+      from: '"XOXO" <no-reply@amrthabit.com>', // sender address
+      to: user.email, // list of receivers
+      subject: "Reset Password", // Subject line
+      text: "Use this link to reset your password", // plain text body
+      html: `<a href="localhost:3000/reset-password/${token}">Hello world?</a>`, // html body
+    });
+
+    console.log("Message sent: %s", info.messageId);
+    console.log(nodemailer.getTestMessageUrl(info));
     return true;
   }
 
@@ -208,5 +270,14 @@ export class UserResolver {
         resolve(true);
       })
     );
+  }
+
+  @Query(() => User, { nullable: true })
+  async getUserFromUsername(
+    @Arg("username") username: string,
+    @Ctx() { em }: MyContext
+  ) {
+    const user = em.findOne(User, { userID: username });
+    return user;
   }
 }
