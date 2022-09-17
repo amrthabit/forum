@@ -21,7 +21,7 @@ function Post({ theme }) {
     useGetPostTopLevelCommentsQuery({
       variables: { postID: parseInt(rawPostID) },
     });
-  console.log(commentsData);
+
   useEffect(() => {
     if (rawPostID === "[deleted]") {
       setMessage("That post is deleted");
@@ -61,14 +61,19 @@ function Post({ theme }) {
         }}
       >
         {message !== "" && message}
-        {data && <PostComp post={data.post} theme={theme} isSole/>}
+        {data && <PostComp post={data.post} theme={theme} isSole />}
         {commentsData &&
           commentsData.getPostTopLevelComments.map((comment) => (
-            <Comment key={comment.id} comment={comment} theme={theme} post={data.post}/>
+            <Comment
+              key={comment.id}
+              comment={comment}
+              theme={theme}
+              post={data.post}
+            />
           ))}
       </Box>
     </Box>
   );
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Post);
+export default withUrqlClient(createUrqlClient)(Post);

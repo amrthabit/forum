@@ -1,0 +1,3 @@
+mutation RemoveCommentVote($commentID: Int!, $voterID: Int!) {
+  removeCommentVote (commentID: $commentID, voterID: $voterID)
+}

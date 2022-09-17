@@ -1,0 +1,6 @@
+query GetUserCommentVotes($voterID:Int!){
+  getUserCommentVotes(voterID:$voterID) {
+    id
+    voteType
+  }
+}

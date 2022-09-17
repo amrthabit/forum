@@ -6,7 +6,7 @@ import { MyContext } from "../types";
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  async posts(@Ctx() { em }: MyContext) {
+  async getPosts(@Ctx() { em }: MyContext) {
     return await em.find(Post, {});
   }
 
@@ -21,7 +21,7 @@ export class PostResolver {
     @Arg("content") content: string,
     @Arg("posterID") posterID: number,
     @Ctx() { em }: MyContext
-  ) {
+  ) {   
     const response = await (em as EntityManager)
       .createQueryBuilder(Post)
       .getKnexQuery()

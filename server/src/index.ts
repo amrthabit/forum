@@ -15,6 +15,8 @@ import { PostedResolver } from "./resolvers/posted";
 import { UserResolver } from "./resolvers/user";
 import { VoteResolver } from "./resolvers/vote";
 import { CommentResolver } from "./resolvers/comment";
+import cookieParser from "cookie-parser";
+import { CommentVoteResolver } from "./resolvers/commentVote";
 
 const main = async () => {
   const orm = await MikroORM.init(mikroOrmConfig);
@@ -23,19 +25,18 @@ const main = async () => {
 
   const RedisStore = connectRedis(session);
   const redis = new Redis();
-
   app.use(cors({ origin: "http://localhost:3000", credentials: true }));
-
+  app.use(cookieParser());
   app.use(
     session({
       name: COOKIE_NAME,
       store: new RedisStore({
-        client: redis as any,
+          client: redis as any,
         disableTouch: true,
       }),
       cookie: {
-        maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years
-        httpOnly: true,
+        maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
+        // httpOnly: true,
         sameSite: "lax",
         secure: __prod__,
       },
@@ -54,6 +55,7 @@ const main = async () => {
         PostedResolver,
         VoteResolver,
         CommentResolver,
+        CommentVoteResolver
       ],
       validate: false,
     }),
@@ -67,8 +69,10 @@ const main = async () => {
     cors: false,
   });
 
-  app.listen(4000, () => {
-    console.log("started server on localhost:4000");
+  const PORT = process.env.PORT || 4000;
+
+  app.listen(PORT, () => {
+    console.log(`started server on localhost:${PORT}`);
   });
 };
 

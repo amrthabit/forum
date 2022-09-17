@@ -1,5 +1,5 @@
-query Posts {
-  posts {
+query GetPosts {
+  getPosts {
     id
     title
     content

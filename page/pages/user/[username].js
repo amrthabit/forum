@@ -39,7 +39,7 @@ function User({ theme }) {
       
       Posts:`);
     }
-  }, [fetching, data]);
+  }, [fetching, data, username]);
 
   return (
     <Box
@@ -71,4 +71,4 @@ function User({ theme }) {
   );
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(User);
+export default withUrqlClient(createUrqlClient)(User);

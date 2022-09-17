@@ -1,0 +1,3 @@
+mutation CastCommentVote($commentID: Int!, $voterID: Int!, $voteType: Int!) {
+  castCommentVote (commentID: $commentID, voterID: $voterID, voteType: $voteType)
+}

@@ -5,12 +5,12 @@ import React, { useState } from "react";
 import MenuButton from "../comps/menuButton";
 import Post from "../comps/post";
 import { useField } from "../comps/useField";
-import { usePostsQuery } from "../src/generated/graphql";
+import { useGetPostsQuery } from "../src/generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 function Home(props) {
   const router = useRouter();
-  const [{ data }] = usePostsQuery();
+  const [{ data }] = useGetPostsQuery();
 
   const theme = props.theme;
 
@@ -71,7 +71,7 @@ function Home(props) {
             Create Post
           </MenuButton>
           {data &&
-            data.posts.map((post) => (
+            data.getPosts.map((post) => (
               <Post key={post.id} post={post} theme={theme} showTopComment />
             ))}
         </Box>
@@ -80,4 +80,4 @@ function Home(props) {
   );
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Home);
+export default withUrqlClient(createUrqlClient)(Home);

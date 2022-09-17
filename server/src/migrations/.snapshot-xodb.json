@@ -144,6 +144,61 @@
           "nullable": false,
           "mappedType": "integer"
         },
+        "voter_id": {
+          "name": "voter_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "comment_id": {
+          "name": "comment_id",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        },
+        "vote_type": {
+          "name": "vote_type",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "mappedType": "integer"
+        }
+      },
+      "name": "comment_vote",
+      "schema": "public",
+      "indexes": [
+        {
+          "keyName": "comment_vote_pkey",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamptz(0)",
@@ -394,6 +449,15 @@
     },
     {
       "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "mappedType": "integer"
+        },
         "voter_id": {
           "name": "voter_id",
           "type": "int",
@@ -428,10 +492,9 @@
         {
           "keyName": "vote_pkey",
           "columnNames": [
-            "voter_id",
-            "post_id"
+            "id"
           ],
-          "composite": true,
+          "composite": false,
           "primary": true,
           "unique": true
         }

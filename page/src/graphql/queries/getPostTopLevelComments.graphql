@@ -1,5 +1,16 @@
 query GetPostTopLevelComments($postID: Float!) {
   getPostTopLevelComments(postID: $postID){
     id
+    createdAt
+    updatedAt
+    content
+    commenterID
+    upvoteCount
+    downvoteCount
+    viewCount
+    rootPostID
+    parentCommentID
+    level
+    isDeleted
   }
 }

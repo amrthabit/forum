@@ -1,5 +1,6 @@
 query GetUserVotes($voterID:Int!){
   getUserVotes(voterID:$voterID) {
+    id
     voteType
   }
 }

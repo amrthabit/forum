@@ -13,11 +13,10 @@ import {
   useRemoveVoteMutation,
 } from "../src/generated/graphql";
 import { LoadingButton } from "@mui/lab";
+import isServer from "../utils/isServer";
 
 export default function VoteArea({ post, theme, ...props }) {
-  const [{ data: meQuery, fetching }] = useMeQuery({
-    // pause: isServer,
-  });
+  const [{ data: meQuery, fetching }] = useMeQuery({});
 
   const [{ data: userVoteQuery }] = useGetUserVoteOnPostQuery({
     variables: { voterID: meQuery?.me?.id, postID: post.id },
@@ -43,7 +42,6 @@ export default function VoteArea({ post, theme, ...props }) {
     setDidUpvote(userVoteQuery?.getUserVoteOnPost?.voteType === 1);
     setDidDownvote(userVoteQuery?.getUserVoteOnPost?.voteType === 0);
     setDisplayedVote(post.upvoteCount - post.downvoteCount);
-    console.log("displayedVote", displayedVote);
   }, [userVoteQuery, post.upvoteCount, post.downvoteCount]);
 
   const [, castVote] = useCastVoteMutation();
@@ -173,7 +171,6 @@ export default function VoteArea({ post, theme, ...props }) {
     <Box sx={{ gridArea: "vote", flexDirection: "column", padding: 1 }}>
       <LoadingButton
         loading={upvoting}
-        loadingPosition="start"
         disabled={upvoting || downvoting}
         sx={{
           zIndex: 1,
@@ -187,7 +184,10 @@ export default function VoteArea({ post, theme, ...props }) {
         {didUpvote ? (
           <ThumbUpIcon />
         ) : (
-          <ThumbUpIconOutlined color={upvoting ? "disabled" : upvoteColor} />
+          <ThumbUpIconOutlined
+            sx={{ transition: upvoting ? "all 0.3s" : "all 0.1s" }}
+            color={upvoting ? "disabled" : upvoteColor}
+          />
         )}
       </LoadingButton>
       <Box
@@ -237,7 +237,6 @@ export default function VoteArea({ post, theme, ...props }) {
       </Box>
       <LoadingButton
         loading={downvoting}
-        loadingPosition="start"
         onClick={handleDownvote}
         disabled={upvoting || downvoting}
         sx={{
@@ -252,6 +251,7 @@ export default function VoteArea({ post, theme, ...props }) {
           <ThumbDownIcon />
         ) : (
           <ThumbDownIconOutlined
+            sx={{ transition: upvoting ? "all 0.3s" : "all 0.1s" }}
             color={downvoting ? "disabled" : downvoteColor}
           />
         )}

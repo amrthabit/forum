@@ -7,19 +7,17 @@ import { useState } from "react";
 import MenuButton from "../comps/menuButton";
 import { useField } from "../comps/useField";
 import {
-  useCreatePostMutation,
-  useMeQuery,
   useCreatePostedMutation,
+  useCreatePostMutation,
+  useGetPostsQuery,
+  useMeQuery,
 } from "../src/generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 
 function Submit(props) {
   const router = useRouter();
-  const [{ data: meQuery, fetching }] = useMeQuery({
-    // pause: isServer,
-  });
-  // console.log(fetching);
-  // console.log(meQuery);
+  const [{ data: meQuery, fetching }] = useMeQuery();
+  const [{ data: posts }] = useGetPostsQuery();
   const [, createPost] = useCreatePostMutation();
   const [, createPosted] = useCreatePostedMutation();
 
@@ -37,8 +35,6 @@ function Submit(props) {
       if (e.type === "blur" || post[e.target.name].error === true) {
         post[e.target.name].validate(e.target.value);
       }
-      // setAlertStatus("false");
-      // setButtonColor("primary");
     },
     reset: () => {
       post.title.set("");
@@ -58,16 +54,15 @@ function Submit(props) {
       content: post.content.text,
       posterID: meQuery.me.id,
     });
-    console.log(result);
     if (result.error) {
-      console.log(result);
+      console.error(result);
     } else {
       post.reset();
       await createPosted({
         postID: result.data.createPost.id,
         posterID: meQuery.me.id,
       });
-      setTimeout(() => router.push("/"), 200);
+      setTimeout(() => router.push("/"), 2000);
     }
 
     setTimeout(() => setSending(false), 200);
@@ -126,7 +121,6 @@ function Submit(props) {
                 placeholder="Title"
                 margin="dense"
                 value={post.title.text}
-                // disabled={buttonStatus === "sending"}
                 error={post.title.error}
                 onChange={post.set}
                 onBlur={post.set}
@@ -135,7 +129,6 @@ function Submit(props) {
                 sx={{
                   width: "100%",
                 }}
-                // onKeyDown={handleEnter}
               />
               <TextField
                 size="small"
@@ -143,7 +136,6 @@ function Submit(props) {
                 placeholder="text"
                 margin="dense"
                 value={post.content.text}
-                // disabled={buttonStatus === "sending"}
                 error={post.content.error}
                 onChange={post.set}
                 onBlur={post.set}
@@ -154,7 +146,6 @@ function Submit(props) {
                 sx={{
                   width: "100%",
                 }}
-                // onKeyDown={handleEnter}
               />
               <LoadingButton
                 onClick={handleSubmit}
@@ -179,4 +170,4 @@ function Submit(props) {
   );
 }
 
-export default withUrqlClient(createUrqlClient, { ssr: true })(Submit);
+export default withUrqlClient(createUrqlClient)(Submit);

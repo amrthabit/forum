@@ -90,7 +90,7 @@ const HamburgerMenu = (props) => (
   </>
 );
 
-function MuiHeader(props) {
+function MuiHeader({ meQuery, ...props }) {
   const theme = props.theme;
   const router = useRouter();
   const [anchorNav, setAnchorNav] = React.useState(null);
@@ -103,8 +103,18 @@ function MuiHeader(props) {
   const pagesRight = () => {
     if (fetching || !data || !data.me) {
       return [
-        ["Sign In", () => {router.push("/login")}],
-        ["Register", () => {router.push("/register")}],
+        [
+          "Sign In",
+          () => {
+            router.push("/login");
+          },
+        ],
+        [
+          "Register",
+          () => {
+            router.push("/register");
+          },
+        ],
       ];
     } else {
       return [

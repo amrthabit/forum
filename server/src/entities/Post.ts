@@ -1,5 +1,5 @@
-import { ArrayType, Entity, PrimaryKey, Property } from "@mikro-orm/core";
-import { Field, Float, ObjectType } from "type-graphql";
+import { Entity, PrimaryKey, Property } from "@mikro-orm/core";
+import { Field, ObjectType } from "type-graphql";
 
 @ObjectType()
 @Entity()

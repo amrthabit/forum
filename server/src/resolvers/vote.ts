@@ -14,14 +14,15 @@ export class VoteResolver {
     { em }: MyContext
   ) {
     return await em.find(Vote, { voterID });
-  }
-
+  } 
+ 
   @Query(() => [Vote])
   async getAllVotes(
     @Ctx()
     { em }: MyContext
   ) {
-    return await em.find(Vote, {});
+    const res = await em.find(Vote, {});
+    return res;
   }
 
   @Query(() => [Vote])
@@ -44,7 +45,6 @@ export class VoteResolver {
     { em }: MyContext
   ) {
     const vote = await em.findOne(Vote, { voterID, postID });
-    console.log(vote, "is the vote");
     if (!vote) {
       return null;
     }
@@ -93,13 +93,10 @@ export class VoteResolver {
     { em }: MyContext
   ) {
     const vote = await em.findOne(Vote, { voterID, postID });
-    console.log(vote, "is the vote");
-    console.log("new vote type", voteType);
-    if (!vote) { 
+    if (!vote) {
       return false;
-    } 
+    }
     vote.voteType = voteType;
-    console.log(vote, "===> is the updated vote");
     await em.persistAndFlush(vote);
 
     const post = await em.findOne(Post, { id: postID });

@@ -16,6 +16,7 @@ import VoteArea from "./voteArea";
 import { useRouter } from "next/router";
 import TopComment from "./topComment";
 import CreateComment from "./createComment";
+import { isServer } from "../utils/isServer";
 
 const getUsernameFromID = (id) => {
   const [{ data: userData, fetching }] = useUserQuery({
@@ -28,11 +29,15 @@ const getUsernameFromID = (id) => {
 };
 
 export default function Post({ post, theme, isSole, ...props }) {
-  const [{ data: meQuery, fetching }] = useMeQuery();
+  const [{ data: meQuery, fetching }] = useMeQuery({
+    // pause: isServer,
+  });
   const [, deletePost] = useDeletePostMutation();
   const [deleting, setDeleting] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
   const [commenting, setCommenting] = useState(props.commenting);
+  const [hideTopComment, setHideTopComment] = useState(false);
+
   const router = useRouter();
 
   const [readableTime, setReadableTime] = useState();
@@ -54,7 +59,16 @@ export default function Post({ post, theme, isSole, ...props }) {
 
   const handleComment = (e) => {
     e.stopPropagation();
-    setCommenting((prev) => !prev);
+    if (props.showTopComment){
+    if (commenting) {
+      setCommenting(false);
+      setTimeout(() => setHideTopComment(false), 200);
+    } else {
+      setHideTopComment(true);
+      setTimeout(() => setCommenting(true), 200);
+    }} else {
+      setCommenting((prev) => !prev);
+    }
   };
 
   return (
@@ -192,17 +206,18 @@ export default function Post({ post, theme, isSole, ...props }) {
             </Button>
           </Box>
         </Box>
-        {props.showTopComment && (
+        <Collapse in={props.showTopComment && !hideTopComment}>
           <TopComment
             post={post}
             theme={theme}
             style={{ position: "relative", zIndex: 0 }}
           />
-        )}
+        </Collapse>
         <CreateComment
           postID={post.id}
           theme={theme}
           commenting={props.commenting || commenting}
+          setCommenting={setCommenting}
         />
       </Box>
     </Collapse>

@@ -18,8 +18,8 @@ import {
 } from "@mui/material";
 import { TransitionGroup } from "react-transition-group";
 import "typeface-roboto";
-import Alert from "./alert";
-import Button from "./button";
+// import Alert from "./alert";
+import Button from "../../comps/button";
 import { useRouter } from "next/router";
 
 const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
@@ -53,7 +53,7 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
             borderRadius: ["xs", "sm"].includes(displaySize) ? 0 : 15,
             boxShadow: ["xs", "sm"].includes(displaySize)
               ? "0px 0px 0px"
-              : `0px 0px 20px ${theme.palette.background.shadow}`,
+              : `0px 0px 20px ${(theme.palette.background as any).shadow}`,
             ...(displaySize === "xs"
               ? {
                   paddingLeft: 20,
@@ -73,7 +73,7 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
                   padding: 40,
                   borderStyle: "solid",
                   borderWidth: 1,
-                  borderColor: theme.palette.background.border,
+                  borderColor: (theme.palette.background as any).border,
                 }),
           }}
         >
@@ -93,7 +93,7 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
             >
               Create your account
             </div>
-            <FormControl
+            {/* <FormControl
               variant="outlined"
               margin="dense"
               size="small"
@@ -106,8 +106,8 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
                 marginTop: 14,
               }}
             >
-              <InputLabel htmlFor="password-field">Password</InputLabel>
-              <OutlinedInput
+              <InputLabel htmlFor="password-field">Password</InputLabel> */}
+              {/* <OutlinedInput
                 id="password-field"
                 name="password"
                 label="Password"
@@ -138,7 +138,7 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
             </FormControl>
             <Collapse in={useForm.password.error} style={errorMessage}>
               Use 8 or more characters
-            </Collapse>
+            </Collapse> */}
             <div
               style={{
                 display: "flex",
@@ -158,7 +158,7 @@ const ChangePassword: NextPage<{ token: string }> = ({ token }) => {
                   fontSize: 16,
                   // fontWeight: 500,
                   textTransform: "none",
-                  color: theme.palette.text.accent,
+                  color: (theme.palette.text as any).accent,
                 }}
               >
                 Sign in instead

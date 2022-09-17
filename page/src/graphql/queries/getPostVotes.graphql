@@ -1,5 +1,6 @@
 query GetPostVotes($postID:Int!){
   getPostVotes(postID:$postID) {
+    id
     voteType
   }
 }

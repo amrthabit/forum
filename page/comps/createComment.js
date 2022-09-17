@@ -2,15 +2,15 @@ import { LoadingButton } from "@mui/lab";
 import { Box, Collapse, TextField } from "@mui/material";
 import { useState } from "react";
 import { useField } from "../comps/useField";
-import { useCreateCommentMutation, useMeQuery } from "../src/generated/graphql";
-
+import { useCreateCommentMutation } from "../src/generated/graphql";
+import { useMeQuery } from "../src/generated/graphql";
 export default function CreateComment({ postID, theme, ...props }) {
   const [, createComment] = useCreateCommentMutation();
   const [{ data: meQuery, fetching }] = useMeQuery();
-
-  const [creatingPost, setCreatingPost] = useState(true);
+  const data = null
   const [sending, setSending] = useState(false);
-
+  const [sent, setSent] = useState(false);
+  const [submitButtonColor, setSubmitButtonColor] = useState("primary");
   const [alertMessage, setAlertMessage] = useState("");
   const comment = {
     content: useField((value) => !/[^ ]/.test(value)), // test for non-whitespace
@@ -31,6 +31,9 @@ export default function CreateComment({ postID, theme, ...props }) {
   };
 
   const handleSubmit = async () => {
+    if (sent) {
+      return;
+    }
     setSending(true);
     if (meQuery?.me) {
       const result = await createComment({
@@ -39,12 +42,18 @@ export default function CreateComment({ postID, theme, ...props }) {
         commenterID: meQuery.me.id,
         content: comment.content.text,
       });
-      console.log(result);
+      // console.log(result);
       if (result.error) {
         console.log(result);
       } else {
         comment.reset();
-        setCreatingPost(false);
+        setSubmitButtonColor("success");
+        setSent(true);
+        setTimeout(() => {
+          setSubmitButtonColor("primary");
+          setSent(false);
+          props.setCommenting(false);
+        }, 2000);
       }
     } else {
       console.log("not logged in");
@@ -82,13 +91,15 @@ export default function CreateComment({ postID, theme, ...props }) {
           name="content"
           placeholder="comment"
           margin="dense"
+          autoComplete="off"
           value={comment.content.text}
-          // disabled={buttonStatus === "sending"}
+          disabled={sending || sent}
           error={comment.content.error}
           onChange={comment.set}
           onBlur={comment.set}
           onFocus={comment.set}
           inputProps={{ maxLength: 600 }}
+
           sx={{
             width: "100%",
           }}
@@ -98,10 +109,11 @@ export default function CreateComment({ postID, theme, ...props }) {
           <Box>{alertMessage}</Box>
           <LoadingButton
             onClick={handleSubmit}
-            disabled={!/[^ ]/.test(comment.content.text)}
+            disabled={!/[^ ]/.test(comment.content.text) && !sent}
             loading={sending}
             loadingPosition="end"
             endIcon={<></>}
+            color={submitButtonColor}
             sx={{
               width: 130,
               marginLeft: "auto",

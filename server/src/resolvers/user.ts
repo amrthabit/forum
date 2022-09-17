@@ -2,14 +2,20 @@ import { EntityManager } from "@mikro-orm/postgresql";
 import argon2 from "argon2";
 import nodemailer from "nodemailer";
 import {
-  Arg, Ctx, Field, Int, Mutation,
-  ObjectType, Query, Resolver
+  Arg,
+  Ctx,
+  Field,
+  Int,
+  Mutation,
+  ObjectType,
+  Query,
+  Resolver,
 } from "type-graphql";
 import { v4 } from "uuid";
 import { COOKIE_NAME, FORGOT_PASSWORD_PREFIX } from "../constants";
 import { User } from "../entities/User";
 import { MyContext } from "../types";
- 
+
 @ObjectType()
 class LoginStatus {
   @Field()
@@ -250,6 +256,7 @@ export class UserResolver {
 
   @Query(() => User, { nullable: true })
   async me(@Ctx() { em, req }: MyContext) {
+    // get client side cookie
     if (!req.session.userID) {
       return null;
     }

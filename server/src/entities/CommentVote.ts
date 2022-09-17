@@ -3,7 +3,7 @@ import { Field, ObjectType } from "type-graphql";
 
 @ObjectType()
 @Entity()
-export class Vote {
+export class CommentVote {
   @Field()
   @PrimaryKey()
   id!: number;
@@ -11,10 +11,10 @@ export class Vote {
   @Field()
   @Property()
   voterID!: number;
-
+   
   @Field()
   @Property()
-  postID!: number;
+  commentID!: number;
 
   // 1 for upvote, 0 for downvote
   // todo: convert this to TinyInt/Boolean type

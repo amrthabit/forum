@@ -11,7 +11,7 @@ export default function TopComment({ post, theme, ...props }) {
     variables: { postID: post.id },
   });
   return (
-    <Collapse in={!fetching && getPostTopComment?.getPostTopComment}>
+    <Collapse in={!fetching && !!getPostTopComment?.getPostTopComment}>
       <Box
         sx={{
           width: "calc(100% - 35px)",

@@ -17,19 +17,20 @@ const darkTheme = createTheme({
       hover: "#444444ff",
       focus: "#bcbcbc",
       commentArea: "#232323",
+      myCommentArea: "#414141",
+      active: "#bcbcbc",
     },
     action: {
       selected: "rgb(200 0 0)",
     },
     text: {
       primary: "rgb(220 220 220)",
-      accent: "rgb(200 200 200)",
+      accent: "#ffdac5",
     },
     scrollbar: {
       track: "#aaaaaa",
       thumb: "#868686",
       thumbhover: "#a5a5a5",
-
     },
   },
 });
@@ -38,6 +39,7 @@ export const lightTheme = createTheme({
   palette: {
     mode: "light",
     text: {
+      primary: "rgb(0 0 0)",
       accent: "#1a73e8",
     },
     background: {
@@ -46,7 +48,9 @@ export const lightTheme = createTheme({
       shadow: "#40404047",
       hover: "#dce0e5fe",
       focus: "#757575",
-      commentArea: "#ebebeb",
+      commentArea: "#f5f5f5",
+      myCommentArea: "#d6d6d6",
+      active: "#4c4c4c",
     },
     scrollbar: {
       track: "#dbdbdb",
@@ -54,7 +58,10 @@ export const lightTheme = createTheme({
       thumbhover: "#7b7b7b",
     },
   },
+  other: darkTheme
 });
+
+darkTheme.other = lightTheme;
 
 export function useTheme() {
   const [theme, setTheme] = useState(darkTheme);
@@ -106,7 +113,7 @@ export function GlobalCSS({ theme, ...props }) {
         }
 
         // workaround to add transition to scrollbar
-        ::-webkit-scrollbar, 
+        ::-webkit-scrollbar,
         ::-webkit-scrollbar-thumb,
         ::-webkit-scrollbar-corner {
           /* add border to act as background-color */
