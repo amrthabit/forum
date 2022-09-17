@@ -4,12 +4,10 @@ import { Box, Collapse, TextField } from "@mui/material";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import MenuButton from "../comps/menuButton";
 import { useField } from "../comps/useField";
 import {
   useCreatePostedMutation,
   useCreatePostMutation,
-  useGetPostsQuery,
   useMeQuery,
 } from "../src/generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
@@ -17,13 +15,11 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 function Submit(props) {
   const router = useRouter();
   const [{ data: meQuery, fetching }] = useMeQuery();
-  const [{ data: posts }] = useGetPostsQuery();
   const [, createPost] = useCreatePostMutation();
   const [, createPosted] = useCreatePostedMutation();
 
   const theme = props.theme;
 
-  const [creatingPost, setCreatingPost] = useState(true);
   const [sending, setSending] = useState(false);
 
   const post = {
@@ -55,7 +51,7 @@ function Submit(props) {
       posterID: meQuery.me.id,
     });
     if (result.error) {
-      console.error(result);
+      console.error("create post error:", result);
     } else {
       post.reset();
       await createPosted({
@@ -83,15 +79,7 @@ function Submit(props) {
             "> Post": { margin: "auto", borderRadius: 2 },
           }}
         >
-          <MenuButton
-            theme={theme}
-            onClick={() => {
-              setCreatingPost(!creatingPost);
-            }}
-          >
-            Create Post
-          </MenuButton>
-          <Collapse in={creatingPost && !meQuery?.me?.id}>
+          <Collapse in={!meQuery?.me?.id}>
             <Box
               sx={{
                 color: theme.palette.text.primary,
@@ -101,7 +89,7 @@ function Submit(props) {
             </Box>
           </Collapse>
           <Collapse
-            in={creatingPost && !!meQuery?.me?.id}
+            in={!!meQuery?.me?.id}
             sx={{
               transition: "all 0.3s",
             }}

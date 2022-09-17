@@ -21,9 +21,7 @@ import useDeviceSize from "./useDeviceSize";
 
 // todo: abstract sizing thing
 const pagesLeft = [
-  ["Play", "#play"],
-  ["Leaderboard", "#leaderboard"],
-  ["Events", "#events"],
+  ["create post", "/submit"],
 ];
 
 const HamburgerMenu = (props) => (
