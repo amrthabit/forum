@@ -108,3 +108,5 @@ dist
 
 # login credentials
 server/src/index.ts
+
+/server/dump.rdb
