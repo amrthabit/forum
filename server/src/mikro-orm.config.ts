@@ -1,7 +1,7 @@
 import { MikroORM } from "@mikro-orm/core";
 import path from "path";
 import { PASSWORD, USER } from "./login" ;
-import { __prod__ } from "./constants";
+import { DATABASE_NAME, __prod__ } from "./constants";
 import { Comment } from "./entities/Comment";
 import { Post } from "./entities/Post";
 import { Posted } from "./entities/Posted";
@@ -16,7 +16,7 @@ export default {
   },
   entities: [Post, User, Posted, Vote, Comment, CommentVote],
   allowGlobalContext: true,
-  dbName: "xodb",
+  dbName: DATABASE_NAME,
   debug: !__prod__,
   type: "postgresql",
   user: USER,
