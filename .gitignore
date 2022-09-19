@@ -7,8 +7,6 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-server/src/login.ts
-
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
@@ -132,3 +130,5 @@ dist
 .pnp.*
 
 *.code-workspace
+# login credentials
+/server/src/login.ts
