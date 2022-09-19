@@ -107,6 +107,6 @@ dist
 *.code-workspace
 
 # login credentials
-server/src/index.ts
+server/src/login.ts
 
-/server/dump.rdb
+server/dump.rdb
