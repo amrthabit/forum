@@ -130,5 +130,6 @@ dist
 .pnp.*
 
 *.code-workspace
+
 # login credentials
 /server/src/login.ts
