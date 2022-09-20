@@ -58,7 +58,6 @@ function useField(test) {
 export default function MuiForm(props) {
   const theme = props.theme;
   const displaySize = props.displaySize;
-  console.log("registerform displaySize", displaySize);
 
   const router = useRouter();
   // graphql code generated using @graphql-codegen

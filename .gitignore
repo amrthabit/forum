@@ -112,3 +112,6 @@ server/src/login.ts
 dump.rdb
 
 .vscode
+
+.yarnrc
+.yarn 
