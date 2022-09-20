@@ -21,7 +21,6 @@ export default function VoteArea({ post, theme, ...props }) {
   const [{ data: userVoteQuery }] = useGetUserVoteOnPostQuery({
     variables: { voterID: meQuery?.me?.id, postID: post.id },
   });
-  // console.log(userVoteQuery);
   const [{ data: postVotesQuery }] = useGetPostVotesQuery({
     variables: { postID: post.id },
   });
@@ -38,7 +37,6 @@ export default function VoteArea({ post, theme, ...props }) {
   );
 
   useEffect(() => {
-    // console.log(userVoteQuery?.getUserVoteOnPost?.voteType);
     setDidUpvote(userVoteQuery?.getUserVoteOnPost?.voteType === 1);
     setDidDownvote(userVoteQuery?.getUserVoteOnPost?.voteType === 0);
     setDisplayedVote(post.upvoteCount - post.downvoteCount);
@@ -50,7 +48,6 @@ export default function VoteArea({ post, theme, ...props }) {
   // must be logged in to vote
   const canVote = () => {
     if (!meQuery?.me) {
-      // console.log("not logged in");
       return false;
     }
     return true;
@@ -60,7 +57,6 @@ export default function VoteArea({ post, theme, ...props }) {
   const [upvoteColor, setUpvoteColor] = useState("primary");
   const [downvoting, setDownvoting] = useState(false);
   const [downvoteColor, setDownvoteColor] = useState("primary");
-  // create function
 
   const handleUpvote = async (e) => {
     e.stopPropagation();
@@ -100,7 +96,6 @@ export default function VoteArea({ post, theme, ...props }) {
         await removeVote({ postID: post.id, voterID: meQuery.me.id });
         // if downvoted flip the vote
       } else {
-        console.log("changeing vote from downvote to upvote");
         setDidUpvote(true);
         setDidDownvote(false);
         const res = await changeVote({
@@ -108,8 +103,6 @@ export default function VoteArea({ post, theme, ...props }) {
           voterID: meQuery.me.id,
           voteType: 1,
         });
-        console.log(res.data);
-        console.log(res);
       }
       setUpvoting(false);
     }, 500);
@@ -154,14 +147,11 @@ export default function VoteArea({ post, theme, ...props }) {
       } else {
         setDidDownvote(true);
         setDidUpvote(false);
-        console.log("changing vote from upvote to downvote");
         const res = await changeVote({
           postID: post.id,
           voterID: meQuery.me.id,
           voteType: 0,
         });
-        console.log(res.data);
-        console.log(res);
       }
       setDownvoting(false);
     }, 500);
