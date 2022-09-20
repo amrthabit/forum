@@ -16,13 +16,9 @@ function MyApp({ Component, pageProps }) {
   // console.log("...", meQuery);
   return (
     <ThemeProvider theme={theme}>
-      <GlobalCSS theme={theme}/>
-      <Header theme={theme}/>
-      <Component
-        displaySize={displaySize}
-        theme={theme}
-        {...pageProps}
-      />
+      <GlobalCSS theme={theme} />
+      <Header theme={theme} displaySize={displaySize} />
+      <Component displaySize={displaySize} theme={theme} {...pageProps} />
     </ThemeProvider>
   );
 }

@@ -18,6 +18,7 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 import isServer from "../utils/isServer";
 import MenuButton from "./menuButton";
 import useDeviceSize from "./useDeviceSize";
+import { Box } from "@material-ui/core";
 
 // todo: abstract sizing thing
 const pagesLeft = [
@@ -68,11 +69,7 @@ const HamburgerMenu = (props) => (
             props.handleCloseNavMenu();
             setTimeout(() => {
               e.preventDefault();
-              let element = document.getElementById(href.substring(1));
-              element.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
-              });
+              props.router.push(href);
             }, 10);
           }}
         >
@@ -88,7 +85,7 @@ const HamburgerMenu = (props) => (
   </>
 );
 
-function MuiHeader({ meQuery, ...props }) {
+function MuiHeader({ displaySize, meQuery, ...props }) {
   const theme = props.theme;
   const router = useRouter();
   const [anchorNav, setAnchorNav] = React.useState(null);
@@ -149,7 +146,6 @@ function MuiHeader({ meQuery, ...props }) {
     setAnchorUser(null);
   };
 
-  const [displaySize] = useDeviceSize();
   return (
     <ThemeProvider theme={theme}>
       <AppBar
@@ -199,6 +195,7 @@ function MuiHeader({ meQuery, ...props }) {
                 theme={theme}
                 anchorElNav={anchorNav}
                 handleCloseNavMenu={handleCloseNavMenu}
+                router={router}
               />
             </Collapse>
 
@@ -234,7 +231,6 @@ function MuiHeader({ meQuery, ...props }) {
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "nowrap",
-                width: "20em",
               }}
             >
               {pagesLeft.map(([page, href]) => (

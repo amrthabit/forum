@@ -109,4 +109,6 @@ dist
 # login credentials
 server/src/login.ts
 
-server/dump.rdb
+dump.rdb
+
+.vscode

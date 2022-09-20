@@ -51,7 +51,7 @@ function invalidateCommentVotes(cache) {
 }
 
 export const createUrqlClient = (ssrExchange) => ({
-  url: "http://localhost:4000/graphql",
+  url: "https://xo.amrthabit.com/api/graphql",
   fetchOptions: {
     credentials: "include",
   },

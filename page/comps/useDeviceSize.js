@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 // get window size (width), required useEffect with next.js
 // usage -> const [size] = useDeviceSize();
 
-const widthToSize = (width) => {
+const widthToSize = () => {
+  const width = window.innerWidth;
   if (width < 450) {
     return "xs";
   } else if (width < 600) {
@@ -15,22 +16,21 @@ const widthToSize = (width) => {
   } else {
     return "xl";
   }
-}; 
+};
 
 const useDeviceSize = () => {
-  const [size, setSize] = useState("md");
+  const [size, setSize] = useState("sm");
 
   const handleWindowResize = () => {
-    setSize(widthToSize(window.innerWidth));
+    setSize(widthToSize());
   };
-
   useEffect(() => {
     // component is mounted and window is available
-    handleWindowResize();
-    window.addEventListener("resize", handleWindowResize);
+    setSize(widthToSize());
+    window.addEventListener("resize", handleWindowResize, true);
     // unsubscribe from the event on component unmount
     return () => window.removeEventListener("resize", handleWindowResize);
-  });
+  }, []);
 
   return [size];
 };
