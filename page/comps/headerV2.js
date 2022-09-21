@@ -85,7 +85,7 @@ const HamburgerMenu = (props) => (
   </>
 );
 
-function MuiHeader({ displaySize, meQuery, ...props }) {
+function MuiHeader({ displaySize, ...props }) {
   const theme = props.theme;
   const router = useRouter();
   const [anchorNav, setAnchorNav] = React.useState(null);

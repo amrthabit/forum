@@ -1,32 +1,18 @@
+import AddCommentIcon from "@mui/icons-material/AddComment";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import ShareIcon from "@mui/icons-material/Share";
 import FlagIcon from "@mui/icons-material/Flag";
-import AddCommentIcon from "@mui/icons-material/AddComment";
+import ShareIcon from "@mui/icons-material/Share";
 import { LoadingButton } from "@mui/lab";
 import { Box, Button, Collapse } from "@mui/material";
-import { useEffect, useState } from "react";
-import {
-  useDeletePostMutation,
-  useMeQuery,
-  useUserQuery,
-} from "../src/generated/graphql";
-import msToString from "../utils/msToString";
-import VoteArea from "./voteArea";
 import { useRouter } from "next/router";
-import TopComment from "./topComment";
+import { useEffect, useState } from "react";
+import { useDeletePostMutation, useMeQuery } from "../src/generated/graphql";
+import msToString from "../utils/msToString";
 import CreateComment from "./createComment";
-import { isServer } from "../utils/isServer";
-
-const getUsernameFromID = (id) => {
-  const [{ data: userData, fetching }] = useUserQuery({
-    variables: { id },
-  });
-  if (userData?.user) {
-    return userData.user.userID;
-  }
-  return "[deleted]";
-};
+import { getUsernameFromID } from "./getUsernameFromID";
+import TopComment from "./topComment";
+import VoteArea from "./voteArea";
 
 export default function Post({ post, theme, isSole, ...props }) {
   const [{ data: meQuery, fetching }] = useMeQuery({
@@ -55,18 +41,19 @@ export default function Post({ post, theme, isSole, ...props }) {
 
     setTimeout(() => setIsDeleted(true), 1000);
   };
-  const username = getUsernameFromID(post.posterID);
+  const username = getUsernameFromID(post.posterID );
 
   const handleComment = (e) => {
     e.stopPropagation();
-    if (props.showTopComment){
-    if (commenting) {
-      setCommenting(false);
-      setTimeout(() => setHideTopComment(false), 200);
+    if (props.showTopComment) {
+      if (commenting) {
+        setCommenting(false);
+        setTimeout(() => setHideTopComment(false), 200);
+      } else {
+        setHideTopComment(true);
+        setTimeout(() => setCommenting(true), 200);
+      }
     } else {
-      setHideTopComment(true);
-      setTimeout(() => setCommenting(true), 200);
-    }} else {
       setCommenting((prev) => !prev);
     }
   };

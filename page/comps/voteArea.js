@@ -2,26 +2,21 @@ import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbDownIconOutlined from "@mui/icons-material/ThumbDownOutlined";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbUpIconOutlined from "@mui/icons-material/ThumbUpOutlined";
+import { LoadingButton } from "@mui/lab";
+import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Box, Button } from "@mui/material";
 import {
   useCastVoteMutation,
   useChangeVoteMutation,
-  useMeQuery,
   useGetUserVoteOnPostQuery,
-  useGetPostVotesQuery,
+  useMeQuery,
   useRemoveVoteMutation,
 } from "../src/generated/graphql";
-import { LoadingButton } from "@mui/lab";
-import isServer from "../utils/isServer";
 
 export default function VoteArea({ post, theme, ...props }) {
   const [{ data: meQuery, fetching }] = useMeQuery({});
   const [{ data: userVoteQuery }] = useGetUserVoteOnPostQuery({
     variables: { voterID: meQuery?.me?.id, postID: post.id },
-  });
-  const [{ data: postVotesQuery }] = useGetPostVotesQuery({
-    variables: { postID: post.id },
   });
 
   const [didUpvote, setDidUpvote] = useState(

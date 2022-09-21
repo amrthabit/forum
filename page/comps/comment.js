@@ -15,7 +15,6 @@ import {
 import {
   useGetCommentByIdQuery,
   useMeQuery,
-  useUserQuery,
   useGetCommentChildrenQuery,
 } from "../src/generated/graphql";
 import { useState } from "react";
@@ -26,6 +25,7 @@ import SquareButton from "./squareButton";
 import { useRouter } from "next/router";
 import { useCastCommentVoteMutation } from "../src/generated/graphql";
 import CommentVoteArea from "./commentVoteArea";
+import { getUsernameFromID } from "./getUsernameFromID";
 
 const StyledTextField = withStyles({
   root: {
@@ -47,16 +47,6 @@ const StyledTextField = withStyles({
   },
 })(TextField);
 
-const getUsernameFromID = (id) => {
-  const [{ data: userData, fetching }] = useUserQuery({
-    variables: { id },
-  });
-  if (userData?.user) {
-    return userData.user.userID;
-  }
-  return "[deleted]";
-};
-
 const getChildren = (commentID) => {
   const [{ data: childrenData, fetching }] = useGetCommentChildrenQuery({
     variables: { commentID },
@@ -75,7 +65,6 @@ export default function Comment({
   parentSetInteracting,
   ...props
 }) {
-  
   const router = useRouter();
   const [, createComment] = useCreateCommentMutation();
   const [replying, setReplying] = useState(false);
@@ -88,8 +77,8 @@ export default function Comment({
     useGetCommentByIdQuery({
       variables: { id: comment.id },
     });
-    
-  const username = getUsernameFromID(commentData?.comment?.commenterID);
+  
+  const username = getUsernameFromID(commentData?.comment?.commenterID );
   const myUsername = meQuery?.me?.userID;
   const isMyComment = username === myUsername;
 

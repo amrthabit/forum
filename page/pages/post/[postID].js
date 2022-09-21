@@ -6,20 +6,21 @@ import Comment from "../../comps/comment";
 import PostComp from "../../comps/post";
 import {
   useGetPostQuery,
-  useGetPostTopLevelCommentsQuery
+  useGetPostTopLevelCommentsQuery,
 } from "../../src/generated/graphql";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 
 function Post({ theme }) {
   const router = useRouter();
   const { postID: rawPostID } = router.query;
+
   const [{ data, fetching }] = useGetPostQuery({
-    variables: { id: parseInt(rawPostID) },
+    variables: { id: parseInt(rawPostID) || -1 },
   });
   const [message, setMessage] = useState("");
   const [{ data: commentsData, fetching: fecthingComments }] =
     useGetPostTopLevelCommentsQuery({
-      variables: { postID: parseInt(rawPostID) },
+      variables: { postID: parseInt(rawPostID) || -1 },
     });
 
   useEffect(() => {
@@ -61,7 +62,7 @@ function Post({ theme }) {
         }}
       >
         {message !== "" && message}
-        {data && <PostComp post={data.post} theme={theme} isSole />}
+        {data?.post && <PostComp post={data.post} theme={theme} isSole />}
         {commentsData &&
           commentsData.getPostTopLevelComments.map((comment) => (
             <Comment

@@ -14,11 +14,11 @@ function User({ theme }) {
   const router = useRouter();
   const { username } = router.query;
   const [{ data, fetching }] = useGetUserFromUsernameQuery({
-    variables: { username },
+    variables: { username: username || "" },
   });
-  const [{ data: postedsData, fetching: fetchingPosteds }] =
+  const [{ data: postedsData }] =
     useGetUserPostedsQuery({
-      variables: { posterID: data?.getUserFromUsername?.id },
+      variables: { posterID: data?.getUserFromUsername?.id || -1 },
     });
   const [message, setMessage] = useState("Loading...");
 
