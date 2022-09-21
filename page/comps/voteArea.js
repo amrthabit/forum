@@ -17,7 +17,6 @@ import isServer from "../utils/isServer";
 
 export default function VoteArea({ post, theme, ...props }) {
   const [{ data: meQuery, fetching }] = useMeQuery({});
-
   const [{ data: userVoteQuery }] = useGetUserVoteOnPostQuery({
     variables: { voterID: meQuery?.me?.id, postID: post.id },
   });
@@ -25,7 +24,6 @@ export default function VoteArea({ post, theme, ...props }) {
     variables: { postID: post.id },
   });
 
-  // todo: refactor
   const [didUpvote, setDidUpvote] = useState(
     userVoteQuery?.getUserVoteOnPost?.voteType === 1
   );
@@ -59,7 +57,10 @@ export default function VoteArea({ post, theme, ...props }) {
   const [downvoteColor, setDownvoteColor] = useState("primary");
 
   const handleUpvote = async (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // parent element is clickable
+    if (upvoting) {
+      return;
+    }
     setTimeout(() => setUpvoting(true), 100);
 
     // todo: refactor into function

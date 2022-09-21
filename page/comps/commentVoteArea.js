@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import {
   useCastCommentVoteMutation,
   useChangeCommentVoteMutation,
-  useGetCommentVotesQuery,
+  useGetCommentScoreQuery,
   useGetUserVoteOnCommentQuery,
   useMeQuery,
   useRemoveCommentVoteMutation,
@@ -24,11 +24,12 @@ export default function CommentVoteArea({
   replying,
   ...props
 }) {
-  const [{ data: meQuery, fetching }] = useMeQuery();
+  const [{ data: meQuery }] = useMeQuery();
   const [{ data: userVoteQuery }] = useGetUserVoteOnCommentQuery({
     variables: { voterID: meQuery?.me?.id, commentID: comment.id },
   });
-  const [{ data: commentVotesQuery }] = useGetCommentVotesQuery({
+
+  const [{ data: commentScoreQuery }] = useGetCommentScoreQuery({
     variables: { commentID: comment.id },
   });
 
@@ -39,32 +40,32 @@ export default function CommentVoteArea({
   const [didDownvote, setDidDownvote] = useState(
     userVoteQuery?.getUserVoteOnComment?.voteType === 0
   );
-  const [displayedVote, setDisplayedVote] = useState(
-    compact(comment.upvoteCount - comment.downvoteCount)
-  );
-  const [voteCount, setVoteCount] = useState(
-    comment.upvoteCount - comment.downvoteCount
-  );
+  const [score, setScore] = useState(commentScoreQuery?.getCommentScore || 0);
+  const [displayedScore, setDisplayedScore] = useState(compact(score));
+
+  useEffect(() => {
+    setScore(commentScoreQuery?.getCommentScore || 0);
+    setDisplayedScore(compact(score));
+  }, [commentScoreQuery]);
+
   useEffect(() => {
     setDidUpvote(userVoteQuery?.getUserVoteOnComment?.voteType === 1);
     setDidDownvote(userVoteQuery?.getUserVoteOnComment?.voteType === 0);
-    setVoteCount(comment.upvoteCount - comment.downvoteCount);
-    setDisplayedVote(compact(comment.upvoteCount - comment.downvoteCount));
-  }, [userVoteQuery, comment.upvoteCount, comment.downvoteCount]);
+  }, [userVoteQuery]);
 
   const [displayedVotePlusOne, setDisplayedVotePlusOne] = useState(
-    compact(voteCount + 1)
+    compact(score + 1)
   );
   useEffect(() => {
-    setDisplayedVotePlusOne(compact(voteCount + 1));
-  }, [voteCount]);
+    setDisplayedVotePlusOne(compact(score + 1));
+  }, [score]);
 
   const [displayedVoteMinusOne, setDisplayedVoteMinusOne] = useState(
-    compact(voteCount - 1)
+    compact(score - 1)
   );
   useEffect(() => {
-    setDisplayedVoteMinusOne(compact(voteCount - 1));
-  }, [voteCount]);
+    setDisplayedVoteMinusOne(compact(score - 1));
+  }, [score]);
   const [, castVote] = useCastCommentVoteMutation();
   const [, removeVote] = useRemoveCommentVoteMutation();
   const [, changeVote] = useChangeCommentVoteMutation();
@@ -261,9 +262,9 @@ export default function CommentVoteArea({
               width: "100%",
               display: "flex",
               transition: "transform 0.3s",
-              transform: `translateY(${
-                (didUpvote ? 13 : didDownvote ? -13 : -0) - 1
-              }px)`,
+              // transform: `translateY(${
+              //   (didUpvote ? 13 : didDownvote ? -13 : -0) - 1
+              // }px)`,
               "> *": {
                 transition: "all 0.1s",
                 width: "100%",
@@ -272,30 +273,30 @@ export default function CommentVoteArea({
               },
             }}
           >
-            <Box
+            {/* <Box
               sx={{
                 transform: `translateY(${-13}px)`,
                 opacity: didUpvote ? 1 : 0,
               }}
             >
               {displayedVotePlusOne}
-            </Box>
+            </Box> */}
             <Box
               sx={{
                 transform: `translateY(${0}px)`,
-                opacity: didUpvote || didDownvote ? 0 : 1,
+                // opacity: didUpvote || didDownvote ? 0 : 1,
               }}
             >
-              {displayedVote}
+              {compact(commentScoreQuery?.getCommentScore || 0)}
             </Box>
-            <Box
+            {/* <Box
               sx={{
                 transform: `translateY(${13}px)`,
                 opacity: didDownvote ? 1 : 0,
               }}
             >
               {displayedVoteMinusOne}
-            </Box>
+            </Box> */}
           </Box>
         </SquareButton>
         <SquareButton // downvote button

@@ -1,13 +1,15 @@
 import { MikroORM } from "@mikro-orm/core";
+import dotenv from "dotenv";
 import path from "path";
-import { PASSWORD, USER } from "./login" ;
-import { DATABASE_NAME, __prod__ } from "./constants";
 import { Comment } from "./entities/Comment";
+import { CommentVote } from "./entities/CommentVote";
 import { Post } from "./entities/Post";
 import { Posted } from "./entities/Posted";
 import { User } from "./entities/User";
 import { Vote } from "./entities/Vote";
-import { CommentVote } from "./entities/CommentVote";
+
+dotenv.config();
+const __prod__ = process.env.NODE_ENV === "production";
 
 export default {
   migrations: {
@@ -16,9 +18,9 @@ export default {
   },
   entities: [Post, User, Posted, Vote, Comment, CommentVote],
   allowGlobalContext: true,
-  dbName: DATABASE_NAME,
+  dbName: process.env.DATABASE_NAME,
   debug: !__prod__,
   type: "postgresql",
-  user: USER,
-  password: PASSWORD,
+  user: process.env.DATABASE_USER,
+  password: process.env.DATABASE_PASSWORD,
 } as Parameters<typeof MikroORM.init>[0];

@@ -215,6 +215,7 @@ export type Query = {
   getAllCommentVotes: Array<CommentVote>;
   getAllVotes: Array<Vote>;
   getCommentChildren: Array<Comment>;
+  getCommentScore: Scalars['Int'];
   getCommentVotes: Array<CommentVote>;
   getPostTopComment?: Maybe<Comment>;
   getPostTopLevelComments: Array<Comment>;
@@ -243,6 +244,11 @@ export type QueryCommentArgs = {
 
 export type QueryGetCommentChildrenArgs = {
   commentID: Scalars['Float'];
+};
+
+
+export type QueryGetCommentScoreArgs = {
+  commentID: Scalars['Int'];
 };
 
 
@@ -455,6 +461,13 @@ export type GetCommentChildrenQueryVariables = Exact<{
 
 
 export type GetCommentChildrenQuery = { __typename?: 'Query', getCommentChildren: Array<{ __typename?: 'Comment', id: number, createdAt: string, updatedAt: string, content: string, commenterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, rootPostID: number, parentCommentID?: number | null, level: number, isDeleted: boolean }> };
+
+export type GetCommentScoreQueryVariables = Exact<{
+  commentID: Scalars['Int'];
+}>;
+
+
+export type GetCommentScoreQuery = { __typename?: 'Query', getCommentScore: number };
 
 export type GetCommentVotesQueryVariables = Exact<{
   commentID: Scalars['Int'];
@@ -742,6 +755,15 @@ export const GetCommentChildrenDocument = gql`
 
 export function useGetCommentChildrenQuery(options: Omit<Urql.UseQueryArgs<GetCommentChildrenQueryVariables>, 'query'>) {
   return Urql.useQuery<GetCommentChildrenQuery, GetCommentChildrenQueryVariables>({ query: GetCommentChildrenDocument, ...options });
+};
+export const GetCommentScoreDocument = gql`
+    query GetCommentScore($commentID: Int!) {
+  getCommentScore(commentID: $commentID)
+}
+    `;
+
+export function useGetCommentScoreQuery(options: Omit<Urql.UseQueryArgs<GetCommentScoreQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetCommentScoreQuery, GetCommentScoreQueryVariables>({ query: GetCommentScoreDocument, ...options });
 };
 export const GetCommentVotesDocument = gql`
     query GetCommentVotes($commentID: Int!) {

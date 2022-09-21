@@ -75,6 +75,7 @@ export default function Comment({
   parentSetInteracting,
   ...props
 }) {
+  
   const router = useRouter();
   const [, createComment] = useCreateCommentMutation();
   const [replying, setReplying] = useState(false);
@@ -87,6 +88,7 @@ export default function Comment({
     useGetCommentByIdQuery({
       variables: { id: comment.id },
     });
+    
   const username = getUsernameFromID(commentData?.comment?.commenterID);
   const myUsername = meQuery?.me?.userID;
   const isMyComment = username === myUsername;

@@ -11,6 +11,8 @@ function invalidateAllComments(cache) {
     "getCommentChildren",
     "getPostTopLevelComments",
     "getPostTopComment",
+    "getUserVoteOnComment",
+    "getCommentVotes",
   ]) {
     const allFields = cache.inspectFields("Query");
     const fieldInfos = allFields.filter((info) => info.fieldName === queryName);
@@ -41,7 +43,11 @@ function invalidateAllPosteds(cache) {
 }
 
 function invalidateCommentVotes(cache) {
-  for (let queryName of ["getUserVoteOnComment", "getCommentVotes"]) {
+  for (let queryName of [
+    "getUserVoteOnComment",
+    "getCommentVotes",
+    "getCommentScore",
+  ]) {
     const allFields = cache.inspectFields("Query");
     const fieldInfos = allFields.filter((info) => info.fieldName === queryName);
     fieldInfos.forEach((fi) => {
@@ -50,8 +56,23 @@ function invalidateCommentVotes(cache) {
   }
 }
 
+function invalidatePostVotes(cache) {
+  for (let queryName of ["getUserVoteOnPost", "getPostVotes"]) {
+    const allFields = cache.inspectFields("Query");
+    const fieldInfos = allFields.filter((info) => info.fieldName === queryName);
+    fieldInfos.forEach((fi) => {
+      cache.invalidate("Query", queryName, fi.arguments || {});
+    });
+  }
+}
+
+const serverURL =
+  process.env.NODE_ENV === "production"
+    ? "https://xo.amrthabit.com/api/graphql"
+    : "http://localhost:4000/graphql";
+
 export const createUrqlClient = (ssrExchange) => ({
-  url: "https://xo.amrthabit.com/api/graphql",
+  url: serverURL,
   fetchOptions: {
     credentials: "include",
   },
@@ -70,6 +91,18 @@ export const createUrqlClient = (ssrExchange) => ({
 
           RemoveCommentVote: (_result, args, cache, info) => {
             invalidateCommentVotes(cache);
+          },
+
+          castVote: (_result, args, cache, info) => {
+            invalidatePostVotes(cache);
+          },
+
+          changeVote: (_result, args, cache, info) => {
+            invalidatePostVotes(cache);
+          },
+
+          RemoveVote: (_result, args, cache, info) => {
+            invalidatePostVotes(cache);
           },
 
           createComment: (_result, args, cache, info) => {
