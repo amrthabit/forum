@@ -278,6 +278,11 @@ export type QueryGetPostVotesArgs = {
 };
 
 
+export type QueryGetPostsArgs = {
+  sort?: InputMaybe<Scalars['String']>;
+};
+
+
 export type QueryGetUserCommentVotesArgs = {
   voterID: Scalars['Int'];
 };
@@ -517,7 +522,9 @@ export type GetPostVotesQueryVariables = Exact<{
 
 export type GetPostVotesQuery = { __typename?: 'Query', getPostVotes: Array<{ __typename?: 'Vote', id: number, voteType: number }> };
 
-export type GetPostsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetPostsQueryVariables = Exact<{
+  sort: Scalars['String'];
+}>;
 
 
 export type GetPostsQuery = { __typename?: 'Query', getPosts: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string }> };
@@ -875,8 +882,8 @@ export function useGetPostVotesQuery(options: Omit<Urql.UseQueryArgs<GetPostVote
   return Urql.useQuery<GetPostVotesQuery, GetPostVotesQueryVariables>({ query: GetPostVotesDocument, ...options });
 };
 export const GetPostsDocument = gql`
-    query GetPosts {
-  getPosts {
+    query GetPosts($sort: String!) {
+  getPosts(sort: $sort) {
     id
     title
     content
@@ -890,7 +897,7 @@ export const GetPostsDocument = gql`
 }
     `;
 
-export function useGetPostsQuery(options?: Omit<Urql.UseQueryArgs<GetPostsQueryVariables>, 'query'>) {
+export function useGetPostsQuery(options: Omit<Urql.UseQueryArgs<GetPostsQueryVariables>, 'query'>) {
   return Urql.useQuery<GetPostsQuery, GetPostsQueryVariables>({ query: GetPostsDocument, ...options });
 };
 export const GetUserCommentVotesDocument = gql`

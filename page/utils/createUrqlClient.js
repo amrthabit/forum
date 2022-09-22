@@ -1,7 +1,6 @@
 import { dedupExchange, fetchExchange } from "@urql/core";
 import { cacheExchange } from "@urql/exchange-graphcache";
 import { MeDocument } from "../src/generated/graphql";
-
 // toto: be more specific with the invalidation
 // or use the cacheExchange's updateQuery
 function updateQuery(cache, qi, result, fun) {
@@ -67,9 +66,8 @@ function invalidatePostVotes(cache) {
     });
   }
 }
-
 const serverURL =
-  process.env.NODE_ENV === "production"
+  process.env.NODE_ENV === "sdf"
     ? "https://xo.amrthabit.com/api/graphql"
     : "http://localhost:4000/graphql";
 
@@ -131,6 +129,12 @@ export const createUrqlClient = (ssrExchange) => ({
           },
 
           login: (_result, args, cache, info) => {
+            invalidateAllPosts(cache);
+            invalidateAllPosteds(cache);
+            invalidateAllComments(cache);
+            invalidatePostVotes(cache);
+            invalidateCommentVotes(cache);
+            
             updateQuery(
               cache,
               { query: MeDocument },

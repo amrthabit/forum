@@ -6,8 +6,49 @@ import { MyContext } from "../types";
 @Resolver()
 export class PostResolver {
   @Query(() => [Post])
-  async getPosts(@Ctx() { em }: MyContext) {
-    return await em.find(Post, {});
+  async getPosts(
+    @Arg("sort", () => String, { nullable: true })
+    sort: string,
+    @Ctx() { em }: MyContext
+  ) {
+    let orderByRaw = "upvote_count - downvote_count";
+    let desc = true;
+    switch (sort) {
+      case "new":
+        orderByRaw = "created_at";
+        break;
+      case "old":
+        orderByRaw = "created_at";
+        desc = false;
+        break;
+      case "top":
+        orderByRaw = "upvote_count - downvote_count";
+        break;
+      case "bottom":
+        orderByRaw = "upvote_count - downvote_count";
+        desc = false;
+        break;
+      case "views":
+        orderByRaw = "views";
+        break;
+      case "comments":
+        orderByRaw = "comment_count";
+        break;
+      case "random":
+        orderByRaw = "RANDOM()";
+        desc = false;
+        break;
+      default:
+        orderByRaw = "upvote_count - downvote_count";
+        break;
+    }
+
+    const res = await em.find(
+      Post,
+      {}, // all}
+      { orderBy: { [`(${orderByRaw})`]: desc ? "DESC" : "" } as any }
+    );
+    return res;
   }
 
   @Query(() => Post, { nullable: true })
