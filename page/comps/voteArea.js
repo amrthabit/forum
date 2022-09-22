@@ -7,9 +7,11 @@ import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
   useCastVoteMutation,
-  useChangeVoteMutation, useGetPostScoreQuery, useGetUserVoteOnPostQuery,
+  useChangeVoteMutation,
+  useGetPostScoreQuery,
+  useGetUserVoteOnPostQuery,
   useMeQuery,
-  useRemoveVoteMutation
+  useRemoveVoteMutation,
 } from "../src/generated/graphql";
 
 const compact = (number) =>
@@ -34,13 +36,25 @@ export default function VoteArea({ post, theme, ...props }) {
     userVoteQuery?.getUserVoteOnPost?.voteType === 0
   );
   const [score, setScore] = useState(scoreQuery?.getPostScore || 0);
+  const [lastScore, setLastScore] = useState(null);
   const [displayedScore, setDisplayedScore] = useState(
     scoreQuery?.getPostScore || 0
   );
-
+  const [lastDisplayedScore, setLastDisplayedScore] = useState(null);
+  const [changingScore, setChangingScore] = useState(false);
   useEffect(() => {
-    setScore(scoreQuery?.getPostScore || 0);
-    setDisplayedScore(compact(scoreQuery?.getPostScore || 0));
+    const newScore = scoreQuery?.getPostScore || 0;
+    if (newScore !== score) {
+      setLastScore(score);
+      setLastDisplayedScore(displayedScore);
+      setChangingScore(true);
+      // changing score is like a trigger for css animation to start
+      // kinda hacky but it works
+      // todo? find pure css solution
+      setTimeout(() => setChangingScore(false), 10);
+    }
+    setScore(newScore);
+    setDisplayedScore(compact(newScore));
   }, [scoreQuery]);
 
   useEffect(() => {
@@ -198,7 +212,6 @@ export default function VoteArea({ post, theme, ...props }) {
           width: "100%",
           display: "flex",
           transition: "transform 0.3s",
-          // transform: `translateY(${didUpvote ? 13 : didDownvote ? -13 : 0}px)`,
           "> *": {
             transition: "all 0.3s",
             height: 25,
@@ -209,30 +222,34 @@ export default function VoteArea({ post, theme, ...props }) {
           },
         }}
       >
-        {/* <Box
+        <Box // major hack for this animation
+          // todo!!: fix nexted ternary
+          // todo: remove color animation, keep one color per number
           sx={{
-            transform: `translateY(${-13}px)`,
-            opacity: didUpvote ? 1 : 0,
-          }}
-        >
-          {displayedVote + 1}
-        </Box> */}
-        <Box
-          sx={{
-            transform: `translateY(${0}px)`,
-            // opacity: didUpvote || didDownvote ? 0 : 1,
+            transition: `opacity ${changingScore ? "0s" : "0.25s"},transform ${
+              changingScore ? "0s" : "0.25s"
+            },color ${changingScore ? "0s" : "0s"}`,
+            transform: `translateY(${
+              changingScore ? (score < lastScore ? 10 : -10) : 0
+            }px)`,
+            opacity: changingScore ? 0 : 1,
           }}
         >
           {displayedScore}
         </Box>
-        {/* <Box
+        <Box
           sx={{
-            transform: `translateY(${13}px)`,
-            opacity: didDownvote ? 1 : 0,
+            transition: `opacity ${changingScore ? "0s" : "0.25s"},transform ${
+              changingScore ? "0s" : "0.25s"
+            },color ${changingScore ? "0s" : "0s"}`,
+            transform: `translateY(${
+              changingScore ? 0 : score < lastScore ? -10 : 10
+            }px)`,
+            opacity: changingScore ? 1 : 0,
           }}
         >
-          {displayedVote - 1}
-        </Box> */}
+          {lastDisplayedScore}
+        </Box>
       </Box>
       <LoadingButton
         loading={downvoting}
