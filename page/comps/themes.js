@@ -6,7 +6,7 @@ const darkTheme = createTheme({
   palette: {
     mode: "dark",
     primary: {
-      main: "rgb(231, 231, 231)",
+      main: "#ffdac5",
       contrastText: "rgb(0 0 0)",
     },
     background: {
@@ -37,12 +37,16 @@ const darkTheme = createTheme({
 
 export const lightTheme = createTheme({
   palette: {
+    primary: {
+      main: "#1a73e8",
+    },
     mode: "light",
     text: {
       primary: "rgb(0 0 0)",
       accent: "#1a73e8",
     },
     background: {
+      default: "#f5f5f5",
       border: "#dadada",
       paper: "#fcfcfc",
       shadow: "#40404047",
@@ -58,7 +62,7 @@ export const lightTheme = createTheme({
       thumbhover: "#7b7b7b",
     },
   },
-  other: darkTheme
+  other: darkTheme,
 });
 
 darkTheme.other = lightTheme;
@@ -103,13 +107,12 @@ export function GlobalCSS({ theme, ...props }) {
           background: ${theme.palette.background.default};
           transition: all 0.3s;
           scrollbar-color: #666 #201c29;
+          overflow-y: scroll;
         }
         body {
           margin: 0;
           border-color: rgba(0, 0, 0, 0.1);
           transition: border-color 0.3s linear;
-          /* make this element do the scrolling */
-          overflow: auto;
         }
 
         // workaround to add transition to scrollbar
