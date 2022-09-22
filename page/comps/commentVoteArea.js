@@ -50,15 +50,15 @@ export default function CommentVoteArea({
   useEffect(() => {
     const newScore = commentScoreQuery?.getCommentScore || 0;
     if (newScore !== score) {
+      setChangingScore(true);
       setLastScore(score);
       setLastDisplayedScore(displayedScore);
-      setChangingScore(true);
       // changing score is like a trigger for css animation to start
       // kinda hacky but it works
       // todo? find pure css solution
       setTimeout(() => {
         setChangingScore(false);
-      }, 10);
+      }, 10); // increasing this delays the animation
     }
     setScore(newScore);
     setDisplayedScore(compact(newScore));
@@ -262,12 +262,12 @@ export default function CommentVoteArea({
               marginLeft: "auto",
               marginRight: "auto",
               height: 17,
-              lineHeight: 1.6,
+              lineHeight: 1.4,
+              fontWeight: 300,
               width: "100%",
               display: "flex",
               transition: "transform 0.3s",
               "> *": {
-                transition: "all 0.1s",
                 width: "100%",
                 position: "absolute",
                 textAlign: "center",
