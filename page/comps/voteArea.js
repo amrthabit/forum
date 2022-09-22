@@ -7,16 +7,24 @@ import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
   useCastVoteMutation,
-  useChangeVoteMutation,
-  useGetUserVoteOnPostQuery,
+  useChangeVoteMutation, useGetPostScoreQuery, useGetUserVoteOnPostQuery,
   useMeQuery,
-  useRemoveVoteMutation,
+  useRemoveVoteMutation
 } from "../src/generated/graphql";
 
+const compact = (number) =>
+  Intl.NumberFormat("en-GB", {
+    notation: "compact",
+    compactDisplay: "short",
+  }).format(number);
+
 export default function VoteArea({ post, theme, ...props }) {
-  const [{ data: meQuery, fetching }] = useMeQuery({});
+  const [{ data: meQuery }] = useMeQuery();
   const [{ data: userVoteQuery }] = useGetUserVoteOnPostQuery({
-    variables: { voterID: meQuery?.me?.id, postID: post.id },
+    variables: { voterID: meQuery?.me?.id || -1, postID: post.id },
+  });
+  const [{ data: scoreQuery }] = useGetPostScoreQuery({
+    variables: { postID: post.id },
   });
 
   const [didUpvote, setDidUpvote] = useState(
@@ -25,15 +33,20 @@ export default function VoteArea({ post, theme, ...props }) {
   const [didDownvote, setDidDownvote] = useState(
     userVoteQuery?.getUserVoteOnPost?.voteType === 0
   );
-  const [displayedVote, setDisplayedVote] = useState(
-    post.upvoteCount - post.downvoteCount
+  const [score, setScore] = useState(scoreQuery?.getPostScore || 0);
+  const [displayedScore, setDisplayedScore] = useState(
+    scoreQuery?.getPostScore || 0
   );
+
+  useEffect(() => {
+    setScore(scoreQuery?.getPostScore || 0);
+    setDisplayedScore(compact(scoreQuery?.getPostScore || 0));
+  }, [scoreQuery]);
 
   useEffect(() => {
     setDidUpvote(userVoteQuery?.getUserVoteOnPost?.voteType === 1);
     setDidDownvote(userVoteQuery?.getUserVoteOnPost?.voteType === 0);
-    setDisplayedVote(post.upvoteCount - post.downvoteCount);
-  }, [userVoteQuery, post.upvoteCount, post.downvoteCount]);
+  }, [userVoteQuery]);
 
   const [, castVote] = useCastVoteMutation();
   const [, removeVote] = useRemoveVoteMutation();
@@ -185,7 +198,7 @@ export default function VoteArea({ post, theme, ...props }) {
           width: "100%",
           display: "flex",
           transition: "transform 0.3s",
-          transform: `translateY(${didUpvote ? 13 : didDownvote ? -13 : 0}px)`,
+          // transform: `translateY(${didUpvote ? 13 : didDownvote ? -13 : 0}px)`,
           "> *": {
             transition: "all 0.3s",
             height: 25,
@@ -196,30 +209,30 @@ export default function VoteArea({ post, theme, ...props }) {
           },
         }}
       >
-        <Box
+        {/* <Box
           sx={{
             transform: `translateY(${-13}px)`,
             opacity: didUpvote ? 1 : 0,
           }}
         >
           {displayedVote + 1}
-        </Box>
+        </Box> */}
         <Box
           sx={{
             transform: `translateY(${0}px)`,
-            opacity: didUpvote || didDownvote ? 0 : 1,
+            // opacity: didUpvote || didDownvote ? 0 : 1,
           }}
         >
-          {displayedVote}
+          {displayedScore}
         </Box>
-        <Box
+        {/* <Box
           sx={{
             transform: `translateY(${13}px)`,
             opacity: didDownvote ? 1 : 0,
           }}
         >
           {displayedVote - 1}
-        </Box>
+        </Box> */}
       </Box>
       <LoadingButton
         loading={downvoting}

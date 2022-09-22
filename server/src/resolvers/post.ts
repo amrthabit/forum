@@ -21,7 +21,7 @@ export class PostResolver {
     @Arg("content") content: string,
     @Arg("posterID") posterID: number,
     @Ctx() { em }: MyContext
-  ) {   
+  ) {
     const response = await (em as EntityManager)
       .createQueryBuilder(Post)
       .getKnexQuery()
@@ -75,5 +75,19 @@ export class PostResolver {
   async deleteAllPosts(@Ctx() { em }: MyContext) {
     await em.nativeDelete(Post, {});
     return true;
+  }
+
+  @Query(() => Int)
+  async getPostScore(
+    @Arg("postID", () => Int)
+    postID: number,
+    @Ctx()
+    { em }: MyContext
+  ) {
+    const post = await em.findOne(Post, { id: postID });
+    if (!post) {
+      return 0;
+    }
+    return post.upvoteCount - post.downvoteCount;
   }
 }

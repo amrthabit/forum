@@ -26,7 +26,7 @@ export default function CommentVoteArea({
 }) {
   const [{ data: meQuery }] = useMeQuery();
   const [{ data: userVoteQuery }] = useGetUserVoteOnCommentQuery({
-    variables: { voterID: meQuery?.me?.id, commentID: comment.id },
+    variables: { voterID: meQuery?.me?.id || -1, commentID: comment.id },
   });
 
   const [{ data: commentScoreQuery }] = useGetCommentScoreQuery({
@@ -41,11 +41,11 @@ export default function CommentVoteArea({
     userVoteQuery?.getUserVoteOnComment?.voteType === 0
   );
   const [score, setScore] = useState(commentScoreQuery?.getCommentScore || 0);
-  const [displayedScore, setDisplayedScore] = useState(compact(score));
+  const [displayedScore, setDisplayedScore] = useState(commentScoreQuery?.getCommentScore || 0);
 
   useEffect(() => {
     setScore(commentScoreQuery?.getCommentScore || 0);
-    setDisplayedScore(compact(score));
+    setDisplayedScore(commentScoreQuery?.getCommentScore || 0);
   }, [commentScoreQuery]);
 
   useEffect(() => {
@@ -287,7 +287,7 @@ export default function CommentVoteArea({
                 // opacity: didUpvote || didDownvote ? 0 : 1,
               }}
             >
-              {compact(commentScoreQuery?.getCommentScore || 0)}
+              {displayedScore}
             </Box>
             {/* <Box
               sx={{

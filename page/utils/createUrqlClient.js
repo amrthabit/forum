@@ -57,7 +57,7 @@ function invalidateCommentVotes(cache) {
 }
 
 function invalidatePostVotes(cache) {
-  for (let queryName of ["getUserVoteOnPost", "getPostVotes"]) {
+  for (let queryName of ["getUserVoteOnPost", "getPostVotes", "getPostScore"]) {
     const allFields = cache.inspectFields("Query");
     const fieldInfos = allFields.filter((info) => info.fieldName === queryName);
     fieldInfos.forEach((fi) => {

@@ -217,6 +217,7 @@ export type Query = {
   getCommentChildren: Array<Comment>;
   getCommentScore: Scalars['Int'];
   getCommentVotes: Array<CommentVote>;
+  getPostScore: Scalars['Int'];
   getPostTopComment?: Maybe<Comment>;
   getPostTopLevelComments: Array<Comment>;
   getPostVotes: Array<Vote>;
@@ -254,6 +255,11 @@ export type QueryGetCommentScoreArgs = {
 
 export type QueryGetCommentVotesArgs = {
   commentID: Scalars['Int'];
+};
+
+
+export type QueryGetPostScoreArgs = {
+  postID: Scalars['Int'];
 };
 
 
@@ -482,6 +488,13 @@ export type GetPostQueryVariables = Exact<{
 
 
 export type GetPostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number } | null };
+
+export type GetPostScoreQueryVariables = Exact<{
+  postID: Scalars['Int'];
+}>;
+
+
+export type GetPostScoreQuery = { __typename?: 'Query', getPostScore: number };
 
 export type GetPostTopCommentQueryVariables = Exact<{
   postID: Scalars['Float'];
@@ -795,6 +808,15 @@ export const GetPostDocument = gql`
 
 export function useGetPostQuery(options: Omit<Urql.UseQueryArgs<GetPostQueryVariables>, 'query'>) {
   return Urql.useQuery<GetPostQuery, GetPostQueryVariables>({ query: GetPostDocument, ...options });
+};
+export const GetPostScoreDocument = gql`
+    query GetPostScore($postID: Int!) {
+  getPostScore(postID: $postID)
+}
+    `;
+
+export function useGetPostScoreQuery(options: Omit<Urql.UseQueryArgs<GetPostScoreQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetPostScoreQuery, GetPostScoreQueryVariables>({ query: GetPostScoreDocument, ...options });
 };
 export const GetPostTopCommentDocument = gql`
     query GetPostTopComment($postID: Float!) {
