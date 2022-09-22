@@ -195,9 +195,6 @@ export default function Comment({
             <LoadingButton
               loading={false}
               disableRipple
-              // startIcon={
-              //   <ReplyIcon style={{ marginRight: -7, marginTop: -2 }} />
-              // }
               sx={{
                 zIndex: 10,
                 borderRadius: 0,
@@ -322,8 +319,9 @@ export default function Comment({
                 onClick={() => {}}
                 sx={{
                   width: 50,
-
                   opacity: interacting || replying ? 1 : 0,
+                  fontSize: 11,
+                  fontWeight: 400
                 }}
               >
                 SHARE
