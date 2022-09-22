@@ -41,7 +41,7 @@ export default function Post({ post, theme, isSole, ...props }) {
 
     setTimeout(() => setIsDeleted(true), 1000);
   };
-  const username = getUsernameFromID(post.posterID );
+  const username = getUsernameFromID(post.posterID);
 
   const handleComment = (e) => {
     e.stopPropagation();
@@ -148,8 +148,16 @@ export default function Post({ post, theme, isSole, ...props }) {
           >
             <Button
               onClick={handleComment}
-              startIcon={<AddCommentIcon style={{ marginRight: -5 }} />}
-              sx={{ marginLeft: -0.8 }}
+              startIcon={
+                <AddCommentIcon
+                  style={{
+                    marginRight: -5,
+                    transition: "all 0.3s",
+                    color: theme.palette.primary.main,
+                  }}
+                />
+              }
+              sx={{ marginLeft: -0.8, color: theme.palette.text.primary }}
             >
               Comment
             </Button>
@@ -157,9 +165,20 @@ export default function Post({ post, theme, isSole, ...props }) {
               <>
                 <LoadingButton
                   loading={deleting}
-                  startIcon={<DeleteIcon style={{ marginRight: -7 }} />}
-                  sx={{ marginLeft: -0.8 }}
+                  startIcon={
+                    <DeleteIcon
+                      style={{
+                        color: theme.palette.text.accent,
+                        marginRight: -7,
+                        transition: "all 0.3s",
+                      }}
+                    />
+                  }
                   onClick={handleDeletePost}
+                  sx={{
+                    transition: "all 0.3s",
+                    color: theme.palette.text.primary,
+                  }}
                 >
                   delete
                 </LoadingButton>
@@ -167,15 +186,32 @@ export default function Post({ post, theme, isSole, ...props }) {
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
-                  startIcon={<EditIcon style={{ marginRight: -5 }} />}
+                  startIcon={
+                    <EditIcon
+                      style={{
+                        marginRight: -5,
+                        transition: "all 0.3s",
+                        color: theme.palette.primary.main,
+                      }}
+                    />
+                  }
+                  sx={{ color: theme.palette.text.primary }}
                 >
                   edit
                 </Button>
               </>
             ) : (
               <Button
-                startIcon={<FlagIcon style={{ marginRight: -5 }} />}
-                sx={{ marginLeft: 0 }}
+                startIcon={
+                  <FlagIcon
+                    style={{
+                      marginRight: -5,
+                      transition: "all 0.3s",
+                      color: theme.palette.primary.main,
+                    }}
+                  />
+                }
+                sx={{ marginLeft: 0, color: theme.palette.text.primary }}
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
@@ -187,7 +223,16 @@ export default function Post({ post, theme, isSole, ...props }) {
               onClick={(e) => {
                 e.stopPropagation();
               }}
-              startIcon={<ShareIcon style={{ marginRight: -5 }} />}
+              startIcon={
+                <ShareIcon
+                  style={{
+                    marginRight: -5,
+                    transition: "all 0.3s",
+                    color: theme.palette.primary.main,
+                  }}
+                />
+              }
+              sx={{ color: theme.palette.text.primary }}
             >
               share
             </Button>
