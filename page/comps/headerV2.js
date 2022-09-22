@@ -91,7 +91,7 @@ function MuiHeader({ displaySize, ...props }) {
   const [anchorNav, setAnchorNav] = React.useState(null);
   const [anchorUser, setAnchorUser] = React.useState(null);
   const [{ data, fetching }] = useMeQuery({
-    pause: isServer,
+    // pause: isServer,
   });
   const [, logout] = useLogoutMutation();
 
