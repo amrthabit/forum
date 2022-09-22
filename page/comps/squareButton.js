@@ -11,8 +11,8 @@ export default function SquareButton({ theme, ...props }) {
         padding: 0,
         borderRadius: 0,
         minWidth: 0,
-        fontSize: 11,
-        
+        fontSize: 13,
+        fontWeight: 600,
         opacity: props.interacting || props.replying ? 1 : 0,
         height: props.replying ? 40 : 17,
         transition: `height 0.2s ease-in-out ${
