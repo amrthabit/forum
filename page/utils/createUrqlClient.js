@@ -2,6 +2,8 @@ import { dedupExchange, fetchExchange } from "@urql/core";
 import { cacheExchange } from "@urql/exchange-graphcache";
 import { MeDocument } from "../src/generated/graphql";
 
+// toto: be more specific with the invalidation
+// or use the cacheExchange's updateQuery
 function updateQuery(cache, qi, result, fun) {
   return cache.updateQuery(qi, (data) => fun(result, data));
 }
@@ -89,7 +91,7 @@ export const createUrqlClient = (ssrExchange) => ({
             invalidateCommentVotes(cache);
           },
 
-          RemoveCommentVote: (_result, args, cache, info) => {
+          removeCommentVote: (_result, args, cache, info) => {
             invalidateCommentVotes(cache);
           },
 
@@ -101,7 +103,7 @@ export const createUrqlClient = (ssrExchange) => ({
             invalidatePostVotes(cache);
           },
 
-          RemoveVote: (_result, args, cache, info) => {
+          removeVote: (_result, args, cache, info) => {
             invalidatePostVotes(cache);
           },
 
