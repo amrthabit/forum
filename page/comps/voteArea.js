@@ -51,7 +51,7 @@ export default function VoteArea({ post, theme, ...props }) {
       // changing score is like a trigger for css animation to start
       // kinda hacky but it works
       // todo? find pure css solution
-      setTimeout(() => setChangingScore(false), 10);
+      setTimeout(() => setChangingScore(false), 100);
     }
     setScore(newScore);
     setDisplayedScore(compact(newScore));
@@ -74,9 +74,18 @@ export default function VoteArea({ post, theme, ...props }) {
   };
 
   const [upvoting, setUpvoting] = useState(false);
-  const [upvoteColor, setUpvoteColor] = useState("primary");
+  const [upvoteColor, setUpvoteColor] = useState(theme.palette.primary.main);
   const [downvoting, setDownvoting] = useState(false);
-  const [downvoteColor, setDownvoteColor] = useState("primary");
+  const [downvoteColor, setDownvoteColor] = useState(
+    theme.palette.primary.main
+  );
+  useEffect(() => {
+    setUpvoteColor(theme.palette.primary.main);
+    setDownvoteColor(theme.palette.primary.main);
+  }, [theme.palette.primary.main]);
+
+  const [upvotingAfterEffect, setUpvotingAfterEffect] = useState(false);
+  const [downvotingAfterEffect, setDownvotingAfterEffect] = useState(false);
 
   const handleUpvote = async (e) => {
     e.stopPropagation(); // parent element is clickable
@@ -88,18 +97,20 @@ export default function VoteArea({ post, theme, ...props }) {
     // todo: refactor into function
     if (!canVote()) {
       setTimeout(() => {
-        setUpvoteColor("error");
+        setUpvoteColor("#ff0000");
         setTimeout(() => {
-          setUpvoteColor("primary");
+          setUpvoteColor(theme.palette.primary.main);
           setTimeout(() => {
-            setUpvoteColor("error");
-            setTimeout(() => setUpvoteColor("primary"), 100);
+            setUpvoteColor("#ff0000");
+            setTimeout(() => setUpvoteColor(theme.palette.primary.main), 100);
           }, 100);
         }, 100);
       }, 500);
 
       setTimeout(() => {
         setUpvoting(false);
+        setUpvotingAfterEffect(true);
+        setTimeout(() => setUpvotingAfterEffect(false), 500);
       }, 500);
       return;
     }
@@ -137,18 +148,20 @@ export default function VoteArea({ post, theme, ...props }) {
 
     if (!canVote()) {
       setTimeout(() => {
-        setDownvoteColor("error");
+        setDownvoteColor("#ff0000");
         setTimeout(() => {
-          setDownvoteColor("primary");
+          setDownvoteColor(theme.palette.primary.main);
           setTimeout(() => {
-            setDownvoteColor("error");
-            setTimeout(() => setDownvoteColor("primary"), 100);
+            setDownvoteColor("#ff0000");
+            setTimeout(() => setDownvoteColor(theme.palette.primary.main), 100);
           }, 100);
         }, 100);
       }, 500);
 
       setTimeout(() => {
         setDownvoting(false);
+        setDownvotingAfterEffect(true);
+        setTimeout(() => setDownvotingAfterEffect(false), 500);
       }, 500);
 
       return;
@@ -190,18 +203,14 @@ export default function VoteArea({ post, theme, ...props }) {
           minWidth: 30,
           width: 30,
           height: 30,
-          "> *": { transition: upvoting ? "all 0.3s" : "all 0.1s" },
+          "> *": {
+            transition: upvotingAfterEffect ? "all 0.1s" : "all 0.3s",
+            color: upvoting ? theme.palette.primary.disabled : upvoteColor,
+          },
         }}
         onClick={handleUpvote}
       >
-        {didUpvote ? (
-          <ThumbUpIcon />
-        ) : (
-          <ThumbUpIconOutlined
-            sx={{ transition: upvoting ? "all 0.3s" : "all 0.1s" }}
-            color={upvoting ? "disabled" : upvoteColor}
-          />
-        )}
+        {didUpvote ? <ThumbUpIcon /> : <ThumbUpIconOutlined />}
       </LoadingButton>
       <Box
         sx={{
@@ -213,7 +222,6 @@ export default function VoteArea({ post, theme, ...props }) {
           display: "flex",
           transition: "transform 0.3s",
           "> *": {
-            transition: "all 0.3s",
             height: 25,
             width: 30,
             position: "absolute",
@@ -228,7 +236,7 @@ export default function VoteArea({ post, theme, ...props }) {
           sx={{
             transition: `opacity ${changingScore ? "0s" : "0.25s"},transform ${
               changingScore ? "0s" : "0.25s"
-            },color ${changingScore ? "0s" : "0s"}`,
+            },color ${changingScore ? "0s" : "0.3s"}`,
             transform: `translateY(${
               changingScore ? (score < lastScore ? 10 : -10) : 0
             }px)`,
@@ -241,7 +249,7 @@ export default function VoteArea({ post, theme, ...props }) {
           sx={{
             transition: `opacity ${changingScore ? "0s" : "0.25s"},transform ${
               changingScore ? "0s" : "0.25s"
-            },color ${changingScore ? "0s" : "0s"}`,
+            },color ${changingScore ? "0s" : "0.3s"}`,
             transform: `translateY(${
               changingScore ? 0 : score < lastScore ? -10 : 10
             }px)`,
@@ -260,17 +268,13 @@ export default function VoteArea({ post, theme, ...props }) {
           minWidth: 30,
           width: 30,
           height: 30,
-          "> *": { transition: upvoting ? "all 0.3s" : "all 0.1s" },
+          "> *": {
+            transition: downvotingAfterEffect ? "all 0.1s" : "all 0.3s",
+            color: downvoting ? theme.palette.primary.disabled : downvoteColor,
+          },
         }}
       >
-        {didDownvote ? (
-          <ThumbDownIcon />
-        ) : (
-          <ThumbDownIconOutlined
-            sx={{ transition: upvoting ? "all 0.3s" : "all 0.1s" }}
-            color={downvoting ? "disabled" : downvoteColor}
-          />
-        )}
+        {didDownvote ? <ThumbDownIcon /> : <ThumbDownIconOutlined />}
       </LoadingButton>
     </Box>
   );
