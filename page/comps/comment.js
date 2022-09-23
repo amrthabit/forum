@@ -400,7 +400,7 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
                   <Box
                     sx={{
                       marginLeft: 1,
-                      marginTop: replying ? 4 : 0.1,
+                      marginTop: 0.1,
                       marginBottom: 0.2,
                       color: theme.palette.text.primary,
                       transition: `color 0.3s, margin 0.3s ease-out ${
