@@ -66,10 +66,7 @@ function invalidatePostVotes(cache) {
     });
   }
 }
-const serverURL =
-  process.env.NODE_ENV === "sdf"
-    ? "https://xo.amrthabit.com/api/graphql"
-    : "http://localhost:4000/graphql";
+const serverURL ="https://xo.amrthabit.com/api/graphql";
 
 export const createUrqlClient = (ssrExchange) => ({
   url: serverURL,
