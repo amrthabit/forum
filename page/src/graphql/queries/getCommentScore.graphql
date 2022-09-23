@@ -1,0 +1,3 @@
+query GetCommentScore($commentID: Int!) {
+  getCommentScore(commentID:$commentID)
+}

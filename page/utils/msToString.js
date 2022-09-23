@@ -1,5 +1,5 @@
 
-// todo: use built in function instead
+// todo? use a built in function instead
 export default function msToString(time) {
   // time passed since post was created in seconds
   const diff = Math.round((new Date() - time) / 1000);

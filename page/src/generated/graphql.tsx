@@ -215,7 +215,9 @@ export type Query = {
   getAllCommentVotes: Array<CommentVote>;
   getAllVotes: Array<Vote>;
   getCommentChildren: Array<Comment>;
+  getCommentScore: Scalars['Int'];
   getCommentVotes: Array<CommentVote>;
+  getPostScore: Scalars['Int'];
   getPostTopComment?: Maybe<Comment>;
   getPostTopLevelComments: Array<Comment>;
   getPostVotes: Array<Vote>;
@@ -246,8 +248,18 @@ export type QueryGetCommentChildrenArgs = {
 };
 
 
+export type QueryGetCommentScoreArgs = {
+  commentID: Scalars['Int'];
+};
+
+
 export type QueryGetCommentVotesArgs = {
   commentID: Scalars['Int'];
+};
+
+
+export type QueryGetPostScoreArgs = {
+  postID: Scalars['Int'];
 };
 
 
@@ -263,6 +275,11 @@ export type QueryGetPostTopLevelCommentsArgs = {
 
 export type QueryGetPostVotesArgs = {
   postID: Scalars['Int'];
+};
+
+
+export type QueryGetPostsArgs = {
+  sort?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -456,6 +473,13 @@ export type GetCommentChildrenQueryVariables = Exact<{
 
 export type GetCommentChildrenQuery = { __typename?: 'Query', getCommentChildren: Array<{ __typename?: 'Comment', id: number, createdAt: string, updatedAt: string, content: string, commenterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, rootPostID: number, parentCommentID?: number | null, level: number, isDeleted: boolean }> };
 
+export type GetCommentScoreQueryVariables = Exact<{
+  commentID: Scalars['Int'];
+}>;
+
+
+export type GetCommentScoreQuery = { __typename?: 'Query', getCommentScore: number };
+
 export type GetCommentVotesQueryVariables = Exact<{
   commentID: Scalars['Int'];
 }>;
@@ -469,6 +493,13 @@ export type GetPostQueryVariables = Exact<{
 
 
 export type GetPostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number } | null };
+
+export type GetPostScoreQueryVariables = Exact<{
+  postID: Scalars['Int'];
+}>;
+
+
+export type GetPostScoreQuery = { __typename?: 'Query', getPostScore: number };
 
 export type GetPostTopCommentQueryVariables = Exact<{
   postID: Scalars['Float'];
@@ -491,7 +522,9 @@ export type GetPostVotesQueryVariables = Exact<{
 
 export type GetPostVotesQuery = { __typename?: 'Query', getPostVotes: Array<{ __typename?: 'Vote', id: number, voteType: number }> };
 
-export type GetPostsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetPostsQueryVariables = Exact<{
+  sort: Scalars['String'];
+}>;
 
 
 export type GetPostsQuery = { __typename?: 'Query', getPosts: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string }> };
@@ -743,6 +776,15 @@ export const GetCommentChildrenDocument = gql`
 export function useGetCommentChildrenQuery(options: Omit<Urql.UseQueryArgs<GetCommentChildrenQueryVariables>, 'query'>) {
   return Urql.useQuery<GetCommentChildrenQuery, GetCommentChildrenQueryVariables>({ query: GetCommentChildrenDocument, ...options });
 };
+export const GetCommentScoreDocument = gql`
+    query GetCommentScore($commentID: Int!) {
+  getCommentScore(commentID: $commentID)
+}
+    `;
+
+export function useGetCommentScoreQuery(options: Omit<Urql.UseQueryArgs<GetCommentScoreQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetCommentScoreQuery, GetCommentScoreQueryVariables>({ query: GetCommentScoreDocument, ...options });
+};
 export const GetCommentVotesDocument = gql`
     query GetCommentVotes($commentID: Int!) {
   getCommentVotes(commentID: $commentID) {
@@ -773,6 +815,15 @@ export const GetPostDocument = gql`
 
 export function useGetPostQuery(options: Omit<Urql.UseQueryArgs<GetPostQueryVariables>, 'query'>) {
   return Urql.useQuery<GetPostQuery, GetPostQueryVariables>({ query: GetPostDocument, ...options });
+};
+export const GetPostScoreDocument = gql`
+    query GetPostScore($postID: Int!) {
+  getPostScore(postID: $postID)
+}
+    `;
+
+export function useGetPostScoreQuery(options: Omit<Urql.UseQueryArgs<GetPostScoreQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetPostScoreQuery, GetPostScoreQueryVariables>({ query: GetPostScoreDocument, ...options });
 };
 export const GetPostTopCommentDocument = gql`
     query GetPostTopComment($postID: Float!) {
@@ -831,8 +882,8 @@ export function useGetPostVotesQuery(options: Omit<Urql.UseQueryArgs<GetPostVote
   return Urql.useQuery<GetPostVotesQuery, GetPostVotesQueryVariables>({ query: GetPostVotesDocument, ...options });
 };
 export const GetPostsDocument = gql`
-    query GetPosts {
-  getPosts {
+    query GetPosts($sort: String!) {
+  getPosts(sort: $sort) {
     id
     title
     content
@@ -846,7 +897,7 @@ export const GetPostsDocument = gql`
 }
     `;
 
-export function useGetPostsQuery(options?: Omit<Urql.UseQueryArgs<GetPostsQueryVariables>, 'query'>) {
+export function useGetPostsQuery(options: Omit<Urql.UseQueryArgs<GetPostsQueryVariables>, 'query'>) {
   return Urql.useQuery<GetPostsQuery, GetPostsQueryVariables>({ query: GetPostsDocument, ...options });
 };
 export const GetUserCommentVotesDocument = gql`

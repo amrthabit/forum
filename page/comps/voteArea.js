@@ -2,45 +2,65 @@ import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import ThumbDownIconOutlined from "@mui/icons-material/ThumbDownOutlined";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import ThumbUpIconOutlined from "@mui/icons-material/ThumbUpOutlined";
+import { LoadingButton } from "@mui/lab";
+import { Box } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Box, Button } from "@mui/material";
 import {
   useCastVoteMutation,
   useChangeVoteMutation,
-  useMeQuery,
+  useGetPostScoreQuery,
   useGetUserVoteOnPostQuery,
-  useGetPostVotesQuery,
+  useMeQuery,
   useRemoveVoteMutation,
 } from "../src/generated/graphql";
-import { LoadingButton } from "@mui/lab";
-import isServer from "../utils/isServer";
+
+const compact = (number) =>
+  Intl.NumberFormat("en-GB", {
+    notation: "compact",
+    compactDisplay: "short",
+  }).format(number);
 
 export default function VoteArea({ post, theme, ...props }) {
-  const [{ data: meQuery, fetching }] = useMeQuery({});
-
+  const [{ data: meQuery }] = useMeQuery();
   const [{ data: userVoteQuery }] = useGetUserVoteOnPostQuery({
-    variables: { voterID: meQuery?.me?.id, postID: post.id },
+    variables: { voterID: meQuery?.me?.id || -1, postID: post.id },
   });
-  const [{ data: postVotesQuery }] = useGetPostVotesQuery({
+  const [{ data: scoreQuery }] = useGetPostScoreQuery({
     variables: { postID: post.id },
   });
 
-  // todo: refactor
   const [didUpvote, setDidUpvote] = useState(
     userVoteQuery?.getUserVoteOnPost?.voteType === 1
   );
   const [didDownvote, setDidDownvote] = useState(
     userVoteQuery?.getUserVoteOnPost?.voteType === 0
   );
-  const [displayedVote, setDisplayedVote] = useState(
-    post.upvoteCount - post.downvoteCount
+  const [score, setScore] = useState(scoreQuery?.getPostScore || 0);
+  const [lastScore, setLastScore] = useState(null);
+  const [displayedScore, setDisplayedScore] = useState(
+    scoreQuery?.getPostScore || 0
   );
+  const [lastDisplayedScore, setLastDisplayedScore] = useState(null);
+  const [changingScore, setChangingScore] = useState(false);
+  useEffect(() => {
+    const newScore = scoreQuery?.getPostScore || 0;
+    if (newScore !== score) {
+      setLastScore(score);
+      setLastDisplayedScore(displayedScore);
+      setChangingScore(true);
+      // changing score is like a trigger for css animation to start
+      // kinda hacky but it works
+      // todo? find pure css solution
+      setTimeout(() => setChangingScore(false), 100);
+    }
+    setScore(newScore);
+    setDisplayedScore(compact(newScore));
+  }, [scoreQuery]);
 
   useEffect(() => {
     setDidUpvote(userVoteQuery?.getUserVoteOnPost?.voteType === 1);
     setDidDownvote(userVoteQuery?.getUserVoteOnPost?.voteType === 0);
-    setDisplayedVote(post.upvoteCount - post.downvoteCount);
-  }, [userVoteQuery, post.upvoteCount, post.downvoteCount]);
+  }, [userVoteQuery]);
 
   const [, castVote] = useCastVoteMutation();
   const [, removeVote] = useRemoveVoteMutation();
@@ -54,29 +74,43 @@ export default function VoteArea({ post, theme, ...props }) {
   };
 
   const [upvoting, setUpvoting] = useState(false);
-  const [upvoteColor, setUpvoteColor] = useState("primary");
+  const [upvoteColor, setUpvoteColor] = useState(theme.palette.primary.main);
   const [downvoting, setDownvoting] = useState(false);
-  const [downvoteColor, setDownvoteColor] = useState("primary");
+  const [downvoteColor, setDownvoteColor] = useState(
+    theme.palette.primary.main
+  );
+  useEffect(() => {
+    setUpvoteColor(theme.palette.primary.main);
+    setDownvoteColor(theme.palette.primary.main);
+  }, [theme.palette.primary.main]);
+
+  const [upvotingAfterEffect, setUpvotingAfterEffect] = useState(false);
+  const [downvotingAfterEffect, setDownvotingAfterEffect] = useState(false);
 
   const handleUpvote = async (e) => {
-    e.stopPropagation();
+    e.stopPropagation(); // parent element is clickable
+    if (upvoting) {
+      return;
+    }
     setTimeout(() => setUpvoting(true), 100);
 
     // todo: refactor into function
     if (!canVote()) {
       setTimeout(() => {
-        setUpvoteColor("error");
+        setUpvoteColor("#ff0000");
         setTimeout(() => {
-          setUpvoteColor("primary");
+          setUpvoteColor(theme.palette.primary.main);
           setTimeout(() => {
-            setUpvoteColor("error");
-            setTimeout(() => setUpvoteColor("primary"), 100);
+            setUpvoteColor("#ff0000");
+            setTimeout(() => setUpvoteColor(theme.palette.primary.main), 100);
           }, 100);
         }, 100);
       }, 500);
 
       setTimeout(() => {
         setUpvoting(false);
+        setUpvotingAfterEffect(true);
+        setTimeout(() => setUpvotingAfterEffect(false), 500);
       }, 500);
       return;
     }
@@ -114,18 +148,20 @@ export default function VoteArea({ post, theme, ...props }) {
 
     if (!canVote()) {
       setTimeout(() => {
-        setDownvoteColor("error");
+        setDownvoteColor("#ff0000");
         setTimeout(() => {
-          setDownvoteColor("primary");
+          setDownvoteColor(theme.palette.primary.main);
           setTimeout(() => {
-            setDownvoteColor("error");
-            setTimeout(() => setDownvoteColor("primary"), 100);
+            setDownvoteColor("#ff0000");
+            setTimeout(() => setDownvoteColor(theme.palette.primary.main), 100);
           }, 100);
         }, 100);
       }, 500);
 
       setTimeout(() => {
         setDownvoting(false);
+        setDownvotingAfterEffect(true);
+        setTimeout(() => setDownvotingAfterEffect(false), 500);
       }, 500);
 
       return;
@@ -167,18 +203,14 @@ export default function VoteArea({ post, theme, ...props }) {
           minWidth: 30,
           width: 30,
           height: 30,
-          "> *": { transition: upvoting ? "all 0.3s" : "all 0.1s" },
+          "> *": {
+            transition: upvotingAfterEffect ? "all 0.1s" : "all 0.3s",
+            color: upvoting ? theme.palette.primary.disabled : upvoteColor,
+          },
         }}
         onClick={handleUpvote}
       >
-        {didUpvote ? (
-          <ThumbUpIcon />
-        ) : (
-          <ThumbUpIconOutlined
-            sx={{ transition: upvoting ? "all 0.3s" : "all 0.1s" }}
-            color={upvoting ? "disabled" : upvoteColor}
-          />
-        )}
+        {didUpvote ? <ThumbUpIcon /> : <ThumbUpIconOutlined />}
       </LoadingButton>
       <Box
         sx={{
@@ -189,9 +221,7 @@ export default function VoteArea({ post, theme, ...props }) {
           width: "100%",
           display: "flex",
           transition: "transform 0.3s",
-          transform: `translateY(${didUpvote ? 13 : didDownvote ? -13 : 0}px)`,
           "> *": {
-            transition: "all 0.3s",
             height: 25,
             width: 30,
             position: "absolute",
@@ -200,29 +230,33 @@ export default function VoteArea({ post, theme, ...props }) {
           },
         }}
       >
-        <Box
+        <Box // major hack for this animation
+          // todo!!: fix nexted ternary
+          // todo: remove color animation, keep one color per number
           sx={{
-            transform: `translateY(${-13}px)`,
-            opacity: didUpvote ? 1 : 0,
+            transition: `opacity ${changingScore ? "0s" : "0.25s"},transform ${
+              changingScore ? "0s" : "0.25s"
+            },color ${changingScore ? "0s" : "0.3s"}`,
+            transform: `translateY(${
+              changingScore ? (score < lastScore ? 10 : -10) : 0
+            }px)`,
+            opacity: changingScore ? 0 : 1,
           }}
         >
-          {displayedVote + 1}
+          {displayedScore}
         </Box>
         <Box
           sx={{
-            transform: `translateY(${0}px)`,
-            opacity: didUpvote || didDownvote ? 0 : 1,
+            transition: `opacity ${changingScore ? "0s" : "0.25s"},transform ${
+              changingScore ? "0s" : "0.25s"
+            },color ${changingScore ? "0s" : "0.3s"}`,
+            transform: `translateY(${
+              changingScore ? 0 : score < lastScore ? -10 : 10
+            }px)`,
+            opacity: changingScore ? 1 : 0,
           }}
         >
-          {displayedVote}
-        </Box>
-        <Box
-          sx={{
-            transform: `translateY(${13}px)`,
-            opacity: didDownvote ? 1 : 0,
-          }}
-        >
-          {displayedVote - 1}
+          {lastDisplayedScore}
         </Box>
       </Box>
       <LoadingButton
@@ -234,17 +268,13 @@ export default function VoteArea({ post, theme, ...props }) {
           minWidth: 30,
           width: 30,
           height: 30,
-          "> *": { transition: upvoting ? "all 0.3s" : "all 0.1s" },
+          "> *": {
+            transition: downvotingAfterEffect ? "all 0.1s" : "all 0.3s",
+            color: downvoting ? theme.palette.primary.disabled : downvoteColor,
+          },
         }}
       >
-        {didDownvote ? (
-          <ThumbDownIcon />
-        ) : (
-          <ThumbDownIconOutlined
-            sx={{ transition: upvoting ? "all 0.3s" : "all 0.1s" }}
-            color={downvoting ? "disabled" : downvoteColor}
-          />
-        )}
+        {didDownvote ? <ThumbDownIcon /> : <ThumbDownIconOutlined />}
       </LoadingButton>
     </Box>
   );

@@ -125,4 +125,18 @@ export class CommentResolver {
     await em.nativeDelete(Comment, {});
     return true;
   }
+
+  @Query(() => Int)
+  async getCommentScore(
+    @Arg("commentID", () => Int)
+    commentID: number,
+    @Ctx()
+    { em }: MyContext
+  ) {
+    const comment = await em.findOne(Comment, { id: commentID });
+    if (!comment) {
+      return 0;
+    }
+    return comment.upvoteCount - comment.downvoteCount;
+  }
 }

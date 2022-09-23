@@ -1,32 +1,18 @@
+import AddCommentIcon from "@mui/icons-material/AddComment";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import ShareIcon from "@mui/icons-material/Share";
 import FlagIcon from "@mui/icons-material/Flag";
-import AddCommentIcon from "@mui/icons-material/AddComment";
+import ShareIcon from "@mui/icons-material/Share";
 import { LoadingButton } from "@mui/lab";
 import { Box, Button, Collapse } from "@mui/material";
-import { useEffect, useState } from "react";
-import {
-  useDeletePostMutation,
-  useMeQuery,
-  useUserQuery,
-} from "../src/generated/graphql";
-import msToString from "../utils/msToString";
-import VoteArea from "./voteArea";
 import { useRouter } from "next/router";
-import TopComment from "./topComment";
+import { useEffect, useState } from "react";
+import { useDeletePostMutation, useMeQuery } from "../src/generated/graphql";
+import msToString from "../utils/msToString";
 import CreateComment from "./createComment";
-import { isServer } from "../utils/isServer";
-
-const getUsernameFromID = (id) => {
-  const [{ data: userData, fetching }] = useUserQuery({
-    variables: { id },
-  });
-  if (userData?.user) {
-    return userData.user.userID;
-  }
-  return "[deleted]";
-};
+import { getUsernameFromID } from "./getUsernameFromID";
+import TopComment from "./topComment";
+import VoteArea from "./voteArea";
 
 export default function Post({ post, theme, isSole, ...props }) {
   const [{ data: meQuery, fetching }] = useMeQuery({
@@ -59,14 +45,15 @@ export default function Post({ post, theme, isSole, ...props }) {
 
   const handleComment = (e) => {
     e.stopPropagation();
-    if (props.showTopComment){
-    if (commenting) {
-      setCommenting(false);
-      setTimeout(() => setHideTopComment(false), 200);
+    if (props.showTopComment) {
+      if (commenting) {
+        setCommenting(false);
+        setTimeout(() => setHideTopComment(false), 200);
+      } else {
+        setHideTopComment(true);
+        setTimeout(() => setCommenting(true), 200);
+      }
     } else {
-      setHideTopComment(true);
-      setTimeout(() => setCommenting(true), 200);
-    }} else {
       setCommenting((prev) => !prev);
     }
   };
@@ -107,6 +94,7 @@ export default function Post({ post, theme, isSole, ...props }) {
               borderColor: theme.palette.background.focus,
               cursor: isSole ? "auto" : "pointer",
             },
+            boxShadow: "0px 0px 2px 1px rgba(0,0,0,0.1)",
           }}
         >
           <VoteArea post={post} theme={theme} />
@@ -161,8 +149,16 @@ export default function Post({ post, theme, isSole, ...props }) {
           >
             <Button
               onClick={handleComment}
-              startIcon={<AddCommentIcon style={{ marginRight: -5 }} />}
-              sx={{ marginLeft: -0.8 }}
+              startIcon={
+                <AddCommentIcon
+                  style={{
+                    marginRight: -5,
+                    transition: "all 0.3s",
+                    color: theme.palette.primary.main,
+                  }}
+                />
+              }
+              sx={{ marginLeft: -0.8, color: theme.palette.text.primary }}
             >
               Comment
             </Button>
@@ -170,9 +166,20 @@ export default function Post({ post, theme, isSole, ...props }) {
               <>
                 <LoadingButton
                   loading={deleting}
-                  startIcon={<DeleteIcon style={{ marginRight: -7 }} />}
-                  sx={{ marginLeft: -0.8 }}
+                  startIcon={
+                    <DeleteIcon
+                      style={{
+                        color: theme.palette.text.accent,
+                        marginRight: -7,
+                        transition: "all 0.3s",
+                      }}
+                    />
+                  }
                   onClick={handleDeletePost}
+                  sx={{
+                    transition: "all 0.3s",
+                    color: theme.palette.text.primary,
+                  }}
                 >
                   delete
                 </LoadingButton>
@@ -180,15 +187,32 @@ export default function Post({ post, theme, isSole, ...props }) {
                   onClick={(e) => {
                     e.stopPropagation();
                   }}
-                  startIcon={<EditIcon style={{ marginRight: -5 }} />}
+                  startIcon={
+                    <EditIcon
+                      style={{
+                        marginRight: -5,
+                        transition: "all 0.3s",
+                        color: theme.palette.primary.main,
+                      }}
+                    />
+                  }
+                  sx={{ color: theme.palette.text.primary }}
                 >
                   edit
                 </Button>
               </>
             ) : (
               <Button
-                startIcon={<FlagIcon style={{ marginRight: -5 }} />}
-                sx={{ marginLeft: 0 }}
+                startIcon={
+                  <FlagIcon
+                    style={{
+                      marginRight: -5,
+                      transition: "all 0.3s",
+                      color: theme.palette.primary.main,
+                    }}
+                  />
+                }
+                sx={{ marginLeft: 0, color: theme.palette.text.primary }}
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
@@ -200,7 +224,16 @@ export default function Post({ post, theme, isSole, ...props }) {
               onClick={(e) => {
                 e.stopPropagation();
               }}
-              startIcon={<ShareIcon style={{ marginRight: -5 }} />}
+              startIcon={
+                <ShareIcon
+                  style={{
+                    marginRight: -5,
+                    transition: "all 0.3s",
+                    color: theme.palette.primary.main,
+                  }}
+                />
+              }
+              sx={{ color: theme.palette.text.primary }}
             >
               share
             </Button>

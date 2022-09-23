@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import {
   useCastCommentVoteMutation,
   useChangeCommentVoteMutation,
-  useGetCommentVotesQuery,
+  useGetCommentScoreQuery,
   useGetUserVoteOnCommentQuery,
   useMeQuery,
   useRemoveCommentVoteMutation,
@@ -24,11 +24,12 @@ export default function CommentVoteArea({
   replying,
   ...props
 }) {
-  const [{ data: meQuery, fetching }] = useMeQuery();
+  const [{ data: meQuery }] = useMeQuery();
   const [{ data: userVoteQuery }] = useGetUserVoteOnCommentQuery({
-    variables: { voterID: meQuery?.me?.id, commentID: comment.id },
+    variables: { voterID: meQuery?.me?.id || -1, commentID: comment.id },
   });
-  const [{ data: commentVotesQuery }] = useGetCommentVotesQuery({
+
+  const [{ data: commentScoreQuery }] = useGetCommentScoreQuery({
     variables: { commentID: comment.id },
   });
 
@@ -39,32 +40,35 @@ export default function CommentVoteArea({
   const [didDownvote, setDidDownvote] = useState(
     userVoteQuery?.getUserVoteOnComment?.voteType === 0
   );
-  const [displayedVote, setDisplayedVote] = useState(
-    compact(comment.upvoteCount - comment.downvoteCount)
+  const [score, setScore] = useState(commentScoreQuery?.getCommentScore || 0);
+  const [lastScore, setLastScore] = useState(null);
+  const [displayedScore, setDisplayedScore] = useState(
+    compact(commentScoreQuery?.getCommentScore || 0)
   );
-  const [voteCount, setVoteCount] = useState(
-    comment.upvoteCount - comment.downvoteCount
-  );
+  const [lastDisplayedScore, setLastDisplayedScore] = useState(null);
+  const [changingScore, setChangingScore] = useState(false);
+  useEffect(() => {
+    const newScore = commentScoreQuery?.getCommentScore || 0;
+    if (newScore !== score) {
+      setChangingScore(true);
+      setLastScore(score);
+      setLastDisplayedScore(displayedScore);
+      // changing score is like a trigger for css animation to start
+      // kinda hacky but it works
+      // todo? find pure css solution
+      setTimeout(() => {
+        setChangingScore(false);
+      }, 10); // increasing this delays the animation
+    }
+    setScore(newScore);
+    setDisplayedScore(compact(newScore));
+  }, [commentScoreQuery]);
+
   useEffect(() => {
     setDidUpvote(userVoteQuery?.getUserVoteOnComment?.voteType === 1);
     setDidDownvote(userVoteQuery?.getUserVoteOnComment?.voteType === 0);
-    setVoteCount(comment.upvoteCount - comment.downvoteCount);
-    setDisplayedVote(compact(comment.upvoteCount - comment.downvoteCount));
-  }, [userVoteQuery, comment.upvoteCount, comment.downvoteCount]);
+  }, [userVoteQuery]);
 
-  const [displayedVotePlusOne, setDisplayedVotePlusOne] = useState(
-    compact(voteCount + 1)
-  );
-  useEffect(() => {
-    setDisplayedVotePlusOne(compact(voteCount + 1));
-  }, [voteCount]);
-
-  const [displayedVoteMinusOne, setDisplayedVoteMinusOne] = useState(
-    compact(voteCount - 1)
-  );
-  useEffect(() => {
-    setDisplayedVoteMinusOne(compact(voteCount - 1));
-  }, [voteCount]);
   const [, castVote] = useCastCommentVoteMutation();
   const [, removeVote] = useRemoveCommentVoteMutation();
   const [, changeVote] = useChangeCommentVoteMutation();
@@ -202,7 +206,7 @@ export default function CommentVoteArea({
     <>
       <Box
         sx={{
-          width: replying ? 0 : 100,
+          // width: replying ? 0 : 100,
           height: replying ? 40 : 17,
           transition: `height 0.2s ease-in-out ${
             replying ? "0s" : "0.3s"
@@ -234,14 +238,14 @@ export default function CommentVoteArea({
           />
         </SquareButton>
 
-        <SquareButton
+        <SquareButton // score container, unclickable
           theme={theme}
           loading={false}
           replying={replying}
           interacting={props.interacting}
           onClick={() => {}}
           sx={{
-            color: didUpvote ? "#ff4000" : didDownvote ? "#af40eb" : "inherit",
+            color: didUpvote ? "#ff4000" : didDownvote ? "#af40eb" : theme.palette.text.primary,
             width: replying ? 0 : props.interacting ? 40 : 40,
             height: replying ? 40 : 17,
             cursor: "default",
@@ -250,6 +254,10 @@ export default function CommentVoteArea({
               opacity: 1,
             },
             opacity: 1,
+            ...(!props.interacting && {
+              background: theme.palette.background.paper,
+              borderStyle: "none",
+            }),
           }}
         >
           <Box // score
@@ -258,43 +266,50 @@ export default function CommentVoteArea({
               marginLeft: "auto",
               marginRight: "auto",
               height: 17,
+              lineHeight: 1.4,
+              fontWeight: 300,
               width: "100%",
               display: "flex",
               transition: "transform 0.3s",
-              transform: `translateY(${
-                (didUpvote ? 13 : didDownvote ? -13 : -0) - 1
-              }px)`,
               "> *": {
-                transition: "all 0.1s",
                 width: "100%",
                 position: "absolute",
                 textAlign: "center",
               },
+              textAlign: "center",
             }}
           >
-            <Box
+            <Box // major hack for this animation
+              // todo!!: fix nexted ternary
+              // todo: remove color animation, keep one color per number
               sx={{
-                transform: `translateY(${-13}px)`,
-                opacity: didUpvote ? 1 : 0,
+                transition: `opacity ${
+                  changingScore ? "0s" : "0.25s"
+                },transform ${changingScore ? "0s" : "0.25s"},color ${
+                  changingScore ? "0s" : "0s"
+                }`,
+                transform: `translateY(${
+                  changingScore ? (score < lastScore ? 10 : -10) : 0
+                }px)`,
+                opacity: changingScore ? 0 : 1,
               }}
             >
-              {displayedVotePlusOne}
+              {displayedScore}
             </Box>
             <Box
               sx={{
-                transform: `translateY(${0}px)`,
-                opacity: didUpvote || didDownvote ? 0 : 1,
+                transition: `opacity ${
+                  changingScore ? "0s" : "0.25s"
+                },transform ${changingScore ? "0s" : "0.25s"},color ${
+                  changingScore ? "0s" : "0s"
+                }`,
+                transform: `translateY(${
+                  changingScore ? 0 : score < lastScore ? -10 : 10
+                }px)`,
+                opacity: changingScore ? 1 : 0,
               }}
             >
-              {displayedVote}
-            </Box>
-            <Box
-              sx={{
-                transform: `translateY(${13}px)`,
-                opacity: didDownvote ? 1 : 0,
-              }}
-            >
-              {displayedVoteMinusOne}
+              {lastDisplayedScore}
             </Box>
           </Box>
         </SquareButton>
@@ -305,11 +320,11 @@ export default function CommentVoteArea({
           onClick={handleDownvote}
           interacting={props.interacting}
           sx={{
-            width: replying ? 0 : 30,
-            ...(downvotingAfterEffect && {
-              background: downvoteColor,
+            width: replying || !props.interacting ? 0 : 30,
+            ...(upvotingAfterEffect && {
+              background: upvoteColor,
               "&:hover, &:active": {
-                background: downvoteColor,
+                background: upvoteColor,
               },
             }),
           }}

@@ -1,5 +1,5 @@
-query GetPosts {
-  getPosts {
+query GetPosts($sort: String!) {
+  getPosts(sort: $sort) {
     id
     title
     content

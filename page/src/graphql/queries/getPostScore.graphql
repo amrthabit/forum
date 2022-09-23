@@ -1,0 +1,3 @@
+query GetPostScore($postID: Int!) {
+  getPostScore(postID: $postID)
+}
