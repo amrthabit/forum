@@ -28,7 +28,7 @@ function invalidateAllPosts(cache) {
     const allFields = cache.inspectFields("Query");
     const fieldInfos = allFields.filter((info) => info.fieldName === queryName);
     fieldInfos.forEach((fi) => {
-      cache.invalidate("Query", fi.fieldName);
+      cache.invalidate("Query", fi.fieldName, fi.arguments || {});
     });
   }
 }
@@ -134,7 +134,7 @@ export const createUrqlClient = (ssrExchange) => ({
             invalidateAllComments(cache);
             invalidatePostVotes(cache);
             invalidateCommentVotes(cache);
-            
+
             updateQuery(
               cache,
               { query: MeDocument },

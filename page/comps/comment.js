@@ -114,7 +114,8 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
       setTimeout(() => setSending(false), 200);
     }, 400);
   };
-
+  // this useMemo prevents grandchildren from rerendering
+  // direct children still rerender with parent // todo: fix
   return useMemo(() => {
     return (
       <Collapse in={!fetchingComment && !!commentData?.comment}>
@@ -391,9 +392,6 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
                   flexDirection: "column",
                   width: "100%",
                   transition: "background 0.3s",
-                  // backgroundColor: isMyComment
-                  //   ? theme.palette.background.myCommentArea
-                  //   : "inherit",
                 }}
               >
                 {commentData?.comment && (

@@ -1,4 +1,5 @@
 import { EntityManager } from "@mikro-orm/postgresql";
+import { Posted } from "../entities/Posted";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { Post } from "../entities/Post";
 import { MyContext } from "../types";
@@ -108,6 +109,7 @@ export class PostResolver {
     if (!post) {
       return false;
     }
+    await em.nativeDelete(Posted, { postID: id });
     await em.nativeDelete(Post, { id });
     return true;
   }
