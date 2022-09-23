@@ -206,7 +206,7 @@ export default function CommentVoteArea({
     <>
       <Box
         sx={{
-          width: replying ? 0 : 100,
+          // width: replying ? 0 : 100,
           height: replying ? 40 : 17,
           transition: `height 0.2s ease-in-out ${
             replying ? "0s" : "0.3s"
@@ -245,7 +245,7 @@ export default function CommentVoteArea({
           interacting={props.interacting}
           onClick={() => {}}
           sx={{
-            color: didUpvote ? "#ff4000" : didDownvote ? "#af40eb" : "inherit",
+            color: didUpvote ? "#ff4000" : didDownvote ? "#af40eb" : theme.palette.text.primary,
             width: replying ? 0 : props.interacting ? 40 : 40,
             height: replying ? 40 : 17,
             cursor: "default",
@@ -254,6 +254,10 @@ export default function CommentVoteArea({
               opacity: 1,
             },
             opacity: 1,
+            ...(!props.interacting && {
+              background: theme.palette.background.paper,
+              borderStyle: "none",
+            }),
           }}
         >
           <Box // score
@@ -316,11 +320,11 @@ export default function CommentVoteArea({
           onClick={handleDownvote}
           interacting={props.interacting}
           sx={{
-            width: replying ? 0 : 30,
-            ...(downvotingAfterEffect && {
-              background: downvoteColor,
+            width: replying || !props.interacting ? 0 : 30,
+            ...(upvotingAfterEffect && {
+              background: upvoteColor,
               "&:hover, &:active": {
-                background: downvoteColor,
+                background: upvoteColor,
               },
             }),
           }}

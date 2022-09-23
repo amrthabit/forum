@@ -38,12 +38,12 @@ const darkTheme = createTheme({
 export const lightTheme = createTheme({
   palette: {
     primary: {
-      main: "#1a73e8",
+      main: "#004299",
     },
     mode: "light",
     text: {
       primary: "rgb(0 0 0)",
-      accent: "#1a73e8",
+      accent: "#004299",
     },
     background: {
       default: "#f5f5f5",
