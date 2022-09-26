@@ -25,6 +25,7 @@ const darkTheme = createTheme({
     },
     text: {
       primary: "rgb(220 220 220)",
+      secondary: "rgb(150 150 150)",
       accent: "#ffdac5",
     },
     scrollbar: {
@@ -43,6 +44,7 @@ export const lightTheme = createTheme({
     mode: "light",
     text: {
       primary: "rgb(0 0 0)",
+      secondary: "rgb(100 100 100)",
       accent: "#004299",
     },
     background: {
