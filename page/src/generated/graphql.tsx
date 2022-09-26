@@ -71,6 +71,7 @@ export type Mutation = {
   removeVote: Scalars['Boolean'];
   updatePost?: Maybe<Post>;
   updateUser?: Maybe<User>;
+  viewPost: Scalars['Boolean'];
 };
 
 
@@ -188,6 +189,11 @@ export type MutationUpdateUserArgs = {
   userID: Scalars['String'];
 };
 
+
+export type MutationViewPostArgs = {
+  postID: Scalars['Int'];
+};
+
 export type Post = {
   __typename?: 'Post';
   content: Scalars['String'];
@@ -220,6 +226,7 @@ export type Query = {
   getPostScore: Scalars['Int'];
   getPostTopComment?: Maybe<Comment>;
   getPostTopLevelComments: Array<Comment>;
+  getPostViews?: Maybe<Scalars['Int']>;
   getPostVotes: Array<Vote>;
   getPosts: Array<Post>;
   getUserCommentVotes: Array<CommentVote>;
@@ -270,6 +277,11 @@ export type QueryGetPostTopCommentArgs = {
 
 export type QueryGetPostTopLevelCommentsArgs = {
   postID: Scalars['Float'];
+};
+
+
+export type QueryGetPostViewsArgs = {
+  postID: Scalars['Int'];
 };
 
 
@@ -459,6 +471,13 @@ export type RemoveVoteMutationVariables = Exact<{
 
 export type RemoveVoteMutation = { __typename?: 'Mutation', removeVote: boolean };
 
+export type ViewPostMutationVariables = Exact<{
+  postID: Scalars['Int'];
+}>;
+
+
+export type ViewPostMutation = { __typename?: 'Mutation', viewPost: boolean };
+
 export type GetCommentByIdQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -514,6 +533,13 @@ export type GetPostTopLevelCommentsQueryVariables = Exact<{
 
 
 export type GetPostTopLevelCommentsQuery = { __typename?: 'Query', getPostTopLevelComments: Array<{ __typename?: 'Comment', id: number, createdAt: string, updatedAt: string, content: string, commenterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, rootPostID: number, parentCommentID?: number | null, level: number, isDeleted: boolean }> };
+
+export type GetPostViewsQueryVariables = Exact<{
+  postID: Scalars['Int'];
+}>;
+
+
+export type GetPostViewsQuery = { __typename?: 'Query', getPostViews?: number | null };
 
 export type GetPostVotesQueryVariables = Exact<{
   postID: Scalars['Int'];
@@ -732,6 +758,15 @@ export const RemoveVoteDocument = gql`
 export function useRemoveVoteMutation() {
   return Urql.useMutation<RemoveVoteMutation, RemoveVoteMutationVariables>(RemoveVoteDocument);
 };
+export const ViewPostDocument = gql`
+    mutation ViewPost($postID: Int!) {
+  viewPost(postID: $postID)
+}
+    `;
+
+export function useViewPostMutation() {
+  return Urql.useMutation<ViewPostMutation, ViewPostMutationVariables>(ViewPostDocument);
+};
 export const GetCommentByIdDocument = gql`
     query GetCommentByID($id: Int!) {
   comment(id: $id) {
@@ -868,6 +903,15 @@ export const GetPostTopLevelCommentsDocument = gql`
 
 export function useGetPostTopLevelCommentsQuery(options: Omit<Urql.UseQueryArgs<GetPostTopLevelCommentsQueryVariables>, 'query'>) {
   return Urql.useQuery<GetPostTopLevelCommentsQuery, GetPostTopLevelCommentsQueryVariables>({ query: GetPostTopLevelCommentsDocument, ...options });
+};
+export const GetPostViewsDocument = gql`
+    query GetPostViews($postID: Int!) {
+  getPostViews(postID: $postID)
+}
+    `;
+
+export function useGetPostViewsQuery(options: Omit<Urql.UseQueryArgs<GetPostViewsQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetPostViewsQuery, GetPostViewsQueryVariables>({ query: GetPostViewsDocument, ...options });
 };
 export const GetPostVotesDocument = gql`
     query GetPostVotes($postID: Int!) {
