@@ -218,7 +218,7 @@ export default function Post({ post, theme, isSole, ...props }) {
             >
               Comment
             </Button>
-            {meQuery?.me?.id === post.posterID ? (
+            {meQuery?.me?.id === post.posterID || meQuery?.me?.isAdmin ? (
               <>
                 <LoadingButton
                   loading={deleting}

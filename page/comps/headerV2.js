@@ -121,9 +121,11 @@ function MuiHeader({ displaySize, ...props }) {
         ],
         [
           // tested with maximum possible width characters down to 320px
-          data.me.userID.length > 5
-            ? data.me.userID.slice(0, 5)
-            : data.me.userID,
+          <Box sx={{ color: data.me.isAdmin ? "red" : "inherit" }}>
+            {data.me.userID.length > 5
+              ? data.me.userID.slice(0, 5)
+              : data.me.userID}
+          </Box>,
           () => {
             router.push(`/user/${data.me.userID}`);
           },

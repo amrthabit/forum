@@ -347,6 +347,7 @@ export type User = {
   email: Scalars['String'];
   firstName: Scalars['String'];
   id: Scalars['Float'];
+  isAdmin: Scalars['Boolean'];
   lastName: Scalars['String'];
   password: Scalars['String'];
   updatedAt: Scalars['String'];
@@ -602,7 +603,7 @@ export type GetUserVotesQuery = { __typename?: 'Query', getUserVotes: Array<{ __
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, userID: string } | null };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, userID: string, isAdmin: boolean } | null };
 
 export type UserQueryVariables = Exact<{
   id: Scalars['Int'];
@@ -1031,6 +1032,7 @@ export const MeDocument = gql`
   me {
     id
     userID
+    isAdmin
   }
 }
     `;
