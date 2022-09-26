@@ -8,6 +8,7 @@ import { Box, Button, Collapse } from "@mui/material";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useDeletePostMutation, useMeQuery } from "../src/generated/graphql";
+import compact from "../utils/compact";
 import msToString from "../utils/msToString";
 import CreateComment from "./createComment";
 import { getUsernameFromID } from "./getUsernameFromID";
@@ -82,12 +83,11 @@ export default function Post({ post, theme, isSole, ...props }) {
             display: "grid",
             gridTemplateColumns: "auto 1fr",
             gridTemplateRows: "auto auto auto 2em",
-            // gap: "1em 1em",
             gridTemplateAreas: `
-          "vote user"
-          "vote title"
-          "vote contents"
-          "vote interact"`,
+              "vote user"
+              "vote title"
+              "vote contents"
+              "vote interact"`,
             "> *": { display: "flex" },
             transition: "all 0.3s",
             ":hover": {
@@ -99,9 +99,31 @@ export default function Post({ post, theme, isSole, ...props }) {
         >
           <VoteArea post={post} theme={theme} />
 
-          <Box sx={{ gridArea: "user", paddingTop: 1, paddingBottom: 0.3 }}>
-            <Box>
-              Posted by{" "}
+          <Box
+            sx={{
+              gridArea: "user",
+              paddingTop: 1,
+              paddingBottom: 0.3,
+              width: "100%",
+              minWidth: 0,
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "row",
+                width: "100%",
+                minWidth: 0,
+              }}
+            >
+              <Box
+                sx={{
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                Posted by&nbsp;
+              </Box>
               <Box
                 component="strong"
                 onClick={(e) => {
@@ -112,28 +134,62 @@ export default function Post({ post, theme, isSole, ...props }) {
                   textDecoration: "underline",
                   transition: "background 0.15s, text-decoration 0.15s",
                   textDecorationColor: "transparent",
-                  margin: -0.5,
-                  padding: 0.5,
+                  // marginRight: 0.3,
                   borderRadius: 1,
                   ":hover": {
                     textDecorationColor: theme.palette.text.primary,
                     background: theme.palette.background.hover,
                     cursor: "pointer",
                   },
+                  overflow: "hidden",
+                  flexShrink: 1,
+                  minWidth: 0,
                 }}
               >
                 {username}
-              </Box>{" "}
-              {readableTime} ago
+              </Box>
+              <Box
+                sx={{
+                  marginRight: "auto",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                &nbsp;{readableTime} ago
+              </Box>
+              <Box
+                sx={{
+                  marginLeft: "auto",
+                  mx: 2,
+                  color: theme.palette.text.secondary,
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
+              >
+                {compact(post.viewCount)} view{post.viewCount === 1 ? "" : "s"}
+              </Box>
             </Box>
           </Box>
-          <Box sx={{ gridArea: "title", fontSize: 20 }}>
-            <Box>
-              <strong>{post.title}</strong>
+          <Box
+            sx={{
+              gridArea: "title",
+              fontSize: 20,
+              minWidth: 0,
+              paddingRight: 1,
+            }}
+          >
+            <Box
+              style={{
+                overflowWrap: "break-word",
+                minWidth: 0,
+                fontWeight: 600,
+              }}
+            >
+              {post.title}
             </Box>
           </Box>
-          <Box sx={{ gridArea: "contents" }}>
-            <Box>{post.content}</Box>
+          <Box sx={{ gridArea: "contents", marginRight: 1 }}>
+            <Box sx={{ overflowWrap: "anywhere" }}>{post.content}</Box>
           </Box>
 
           <Box
@@ -162,7 +218,7 @@ export default function Post({ post, theme, isSole, ...props }) {
             >
               Comment
             </Button>
-            {meQuery?.me?.id === post.posterID ? (
+            {meQuery?.me?.id === post.posterID || meQuery?.me?.isAdmin ? (
               <>
                 <LoadingButton
                   loading={deleting}

@@ -16,7 +16,7 @@ const darkTheme = createTheme({
       shadow: "#0c0c0cff",
       hover: "#444444ff",
       focus: "#bcbcbc",
-      commentArea: "#232323",
+      commentArea: "#292828",
       myCommentArea: "#414141",
       active: "#bcbcbc",
     },
@@ -25,6 +25,7 @@ const darkTheme = createTheme({
     },
     text: {
       primary: "rgb(220 220 220)",
+      secondary: "rgb(150 150 150)",
       accent: "#ffdac5",
     },
     scrollbar: {
@@ -43,6 +44,7 @@ export const lightTheme = createTheme({
     mode: "light",
     text: {
       primary: "rgb(0 0 0)",
+      secondary: "rgb(100 100 100)",
       accent: "#004299",
     },
     background: {
@@ -52,7 +54,7 @@ export const lightTheme = createTheme({
       shadow: "#40404047",
       hover: "#dce0e5fe",
       focus: "#757575",
-      commentArea: "#f5f5f5",
+      commentArea: "#ebebeb",
       myCommentArea: "#d6d6d6",
       active: "#4c4c4c",
     },

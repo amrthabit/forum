@@ -1,32 +1,21 @@
-// // react functional component for a comment
-
 import "@fontsource/jetbrains-mono";
-import ReplyIcon from "@mui/icons-material/Reply";
-import ShareIcon from "@mui/icons-material/Share";
 import { LoadingButton } from "@mui/lab";
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Collapse,
-  TextField,
-  Typography,
-} from "@mui/material";
-import {
-  useGetCommentByIdQuery,
-  useMeQuery,
-  useGetCommentChildrenQuery,
-} from "../src/generated/graphql";
-import { memo, useMemo, useState } from "react";
-import { useField } from "./useField";
-import { useCreateCommentMutation } from "../src/generated/graphql";
+import { Box, Button, Collapse, TextField } from "@mui/material";
 import { withStyles } from "@mui/styles";
-import SquareButton from "./squareButton";
 import { useRouter } from "next/router";
-import { useCastCommentVoteMutation } from "../src/generated/graphql";
+import { useMemo, useState } from "react";
+import {
+  useCreateCommentMutation,
+  useGetCommentByIdQuery,
+  useGetCommentChildrenQuery,
+  useMeQuery,
+  useUserQuery,
+} from "../src/generated/graphql";
 import CommentVoteArea from "./commentVoteArea";
-import { getUsernameFromID } from "./getUsernameFromID";
+import SquareButton from "./squareButton";
+import { useField } from "./useField";
 
+// override default MUI textfield styles
 const StyledTextField = withStyles({
   root: {
     "& .MuiOutlinedInput-root": {
@@ -61,11 +50,15 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
       variables: { id: comment.id },
     });
 
-  const [{ data: childrenData, fetching }] = useGetCommentChildrenQuery({
+  const [{ data: childrenData }] = useGetCommentChildrenQuery({
     variables: { commentID: comment.id || -1 },
   });
 
-  const username = getUsernameFromID(commentData?.comment?.commenterID);
+  const [{ data: userData }] = useUserQuery({
+    variables: { id: commentData?.comment?.commenterID || -1 },
+  });
+
+  const username = userData?.user?.userID || "[deleted]";
   const myUsername = meQuery?.me?.userID;
   const isMyComment = username === myUsername;
 
@@ -114,7 +107,9 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
       setTimeout(() => setSending(false), 200);
     }, 400);
   };
-
+  // TODO!: refactor
+  // this useMemo prevents grandchildren from rerendering
+  // direct children still rerender with parent // todo: fix
   return useMemo(() => {
     return (
       <Collapse in={!fetchingComment && !!commentData?.comment}>
@@ -182,6 +177,7 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
                 },
                 opacity: 1,
                 borderTopLeftRadius: 4,
+                overflow: "hidden", 
               }}
             >
               {username}
@@ -201,8 +197,9 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
                   borderBottomRightRadius: 4,
                   boxShadow: replying
                     ? ""
-                    : "0px 0px 1px 0px" + theme.palette.background.shadow,
+                    : "0px 0px 3px 0px" + theme.palette.background.shadow,
                   overflow: "hidden",
+                  transition: "all 0.3s",
                 }}
               >
                 <CommentVoteArea
@@ -391,9 +388,6 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
                   flexDirection: "column",
                   width: "100%",
                   transition: "background 0.3s",
-                  // backgroundColor: isMyComment
-                  //   ? theme.palette.background.myCommentArea
-                  //   : "inherit",
                 }}
               >
                 {commentData?.comment && (
@@ -431,16 +425,17 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
       </Collapse>
     );
   }, [
-    commentData,
-    comment,
-    replying,
-    interacting,
-    childrenData,
-    fetchingComment,
-    meQuery,
     reply.content.text,
-    sending,
     submitButtonColor,
+    fetchingComment,
+    childrenData,
+    interacting,
+    commentData,
+    userData,
+    replying,
+    meQuery,
+    sending,
+    comment,
     theme,
   ]);
 }

@@ -35,4 +35,8 @@ export class User {
   @Field(() => String)
   @Property({ type: "date", onUpdate: () => new Date() })
   updatedAt = new Date();
+
+  @Field(() => Boolean)
+  @Property({ type: "boolean", default: false })
+  isAdmin: boolean;
 }

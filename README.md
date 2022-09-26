@@ -6,10 +6,10 @@ Install Node then `yarn install` in each directory to install packages
 
 Install PostgreSQL 14 and create `xo` database, remember user and password
 
-Create login.ts with `USER` and `PASSWORD` at `xo/server/src`
+At `xo/server`, create a `.env` with `DATABASE_USER`, `DATABASE_PASSWORD` along with other info.
 
 Install Redis and start on default port
 
-`yarn tsc` or `yarn watch` and `yarn dev` on `xo/server`
+`yarn tsc`, `yarn watch` and `yarn dev` on `xo/server`
 
 `yarn dev` on `xo/page`

@@ -19,7 +19,7 @@ function Home({ sort = "top", ...props }) {
     <ThemeProvider theme={theme}>
       <Box
         id="posts-column"
-        sx={{ display: "flex", margin: 1, paddingBottom: 5 }}
+        sx={{ display: "flex", margin: 1, paddingBottom: 5, minWidth: 305 }}
       >
         <Box
           sx={{
@@ -54,10 +54,10 @@ function Home({ sort = "top", ...props }) {
                 display: "flex",
                 marginTop: -0.4,
                 marginLeft: 1,
-                marginRight: 2
+                marginRight: 2,
               }}
             >
-              <p style={{margin: "auto" }}>Sort by</p>
+              <p style={{ margin: "auto", whiteSpace: "nowrap" }}>Sort by</p>
             </Box>
             {availableSorts.map(
               (
@@ -76,6 +76,7 @@ function Home({ sort = "top", ...props }) {
                       borderColor: theme.palette.primary.main,
                     }),
                     borderRadius: 1,
+                    overflow: "hidden",
                   }}
                 >
                   {sortType.toUpperCase()}

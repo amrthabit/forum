@@ -18,31 +18,31 @@ import { createUrqlClient } from "../utils/createUrqlClient";
 import isServer from "../utils/isServer";
 import MenuButton from "./menuButton";
 import useDeviceSize from "./useDeviceSize";
-import { Box } from "@material-ui/core";
+import { Box } from "@mui/material";
 
 // todo: abstract sizing thing
-const pagesLeft = [
-  ["create post", "/submit"],
-];
+const pagesLeft = [["create post", "/submit"]];
 
 const HamburgerMenu = (props) => (
   <>
-    <IconButton
-      size="large"
-      aria-label="account of current user"
-      aria-controls="menu-appbar"
-      aria-haspopup="true"
-      onClick={props.handleOpenNavMenu}
+    <MenuIcon
       sx={{
+        transition: "all 0.3s",
+        width: 28,
+        height: 30,
+        margin: "auto",
+        borderStyle: "solid",
+        borderWidth: 1,
+        borderColor: props.theme.palette.background.paper,
         color: props.theme.palette.text.primary,
-        transition: "all 0.3s ease-in-out",
-        marginLeft: -1,
-        // mui hamburger menu icon not centered??
-        marginTop: 0.2,
+        cursor: "pointer",
+        ":hover, :focus-visible": {
+          background: props.theme.palette.background.hover,
+          borderColor: props.theme.palette.text.primary,
+        },
       }}
-    >
-      <MenuIcon />
-    </IconButton>
+      onClick={props.handleOpenNavMenu}
+    />
     <Menu
       id="menu-appbar"
       anchorEl={props.anchorElNav}
@@ -120,9 +120,12 @@ function MuiHeader({ displaySize, ...props }) {
           },
         ],
         [
-          data.me.userID.length > 8
-            ? data.me.userID.slice(0, 7)
-            : data.me.userID,
+          // tested with maximum possible width characters down to 320px
+          <Box sx={{ color: data.me.isAdmin ? "red" : "inherit" }}>
+            {data.me.userID.length > 5
+              ? data.me.userID.slice(0, 5)
+              : data.me.userID}
+          </Box>,
           () => {
             router.push(`/user/${data.me.userID}`);
           },
@@ -148,29 +151,34 @@ function MuiHeader({ displaySize, ...props }) {
 
   return (
     <ThemeProvider theme={theme}>
-      <AppBar
-        position="sticky"
-        style={{
+      <Box
+        sx={{
+          position: "sticky",
+          top: 0,
+          left: 0,
+          right: 0,
+          minWidth: 320,
           background: theme.palette.background.paper,
           color: theme.palette.text.primary,
           transition: "all 0.3s ease-in-out",
           height: ["xs", "sm"].includes(displaySize) ? 40 : 50,
-          width: "100%",
           zIndex: 10,
+          boxShadow: "0px 0px 10px 0px rgba(0,0,0,0.2)",
         }}
       >
         <div
           id="header-flex-div"
           style={{
-            width: "100%",
+            margin: "auto",
+            maxWidth: 1100,
             transition: "inherit",
             display: "flex",
             flexDirection: "row",
             alignItems: "center",
-            justifyContent: "space-between",
             height: "100%",
-            maxWidth: 1100,
-            margin: "auto",
+            paddingLeft: ["xs", "sm"].includes(displaySize) ? 8 : 16,
+            paddingRight: ["xs", "sm"].includes(displaySize) ? 8 : 16,
+            overflow: "hidden",
           }}
         >
           <div
@@ -181,14 +189,18 @@ function MuiHeader({ displaySize, ...props }) {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              margin: ["xs", "sm"].includes(displaySize) ? 10 : 20,
-              marginRight: ["xs", "sm"].includes(displaySize) ? 10 : 0,
+              height: 38,
             }}
           >
-            <Collapse
-              in={["xs", "sm"].includes(displaySize)}
+            <Box
               id="10"
               orientation="horizontal"
+              sx={{
+                display: "flex",
+                width: ["xs", "sm"].includes(displaySize) ? 30 : 0,
+                transition: "all 0.3s",
+                overflow: "hidden",
+              }}
             >
               <HamburgerMenu
                 handleOpenNavMenu={handleOpenNavMenu}
@@ -197,7 +209,7 @@ function MuiHeader({ displaySize, ...props }) {
                 handleCloseNavMenu={handleCloseNavMenu}
                 router={router}
               />
-            </Collapse>
+            </Box>
 
             <MenuButton
               theme={theme}
@@ -212,25 +224,25 @@ function MuiHeader({ displaySize, ...props }) {
               style={{
                 color: theme.palette.text.primary,
                 textDecoration: "none",
-                marginLeft: 0,
                 margin: "auto",
+                marginRight: 1,
+                marginLeft: 1,
                 fontSize: 20,
-                padding: 1,
+                width: 40,
+                height: 36,
               }}
             >
               XOXO
             </MenuButton>
-            <Collapse
-              component="div"
-              in={["md", "lg", "xl"].includes(displaySize)}
-              orientation="horizontal"
-              style={{
+            <Box
+              sx={{
+                width: ["md", "lg", "xl"].includes(displaySize) ? 110 : 0,
                 transition: "all 0.3s",
                 margin: "auto",
-                height: "2.3em",
                 display: "flex",
                 flexDirection: "row",
                 flexWrap: "nowrap",
+                overflow: "hidden",
               }}
             >
               {pagesLeft.map(([page, href]) => (
@@ -238,7 +250,7 @@ function MuiHeader({ displaySize, ...props }) {
                   {page}
                 </MenuButton>
               ))}
-            </Collapse>
+            </Box>
           </div>
           <TransitionGroup
             id="header-right"
@@ -248,30 +260,27 @@ function MuiHeader({ displaySize, ...props }) {
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              margin: ["xs", "sm"].includes(displaySize) ? 10 : 20,
+              marginLeft: "auto",
             }}
           >
-            {
-              // ["xl", "lg", "md"].includes(displaySize) &&
-              pagesRight().map(([page, handler]) => (
-                <Collapse
+            {pagesRight().map(([page, handler]) => (
+              <Collapse
+                key={page}
+                orientation="horizontal"
+                style={{ margin: "auto" }}
+              >
+                <MenuButton
+                  theme={theme}
                   key={page}
-                  orientation="horizontal"
-                  style={{ margin: "auto" }}
+                  onClick={() => {
+                    handleCloseNavMenu();
+                    handler();
+                  }}
                 >
-                  <MenuButton
-                    theme={theme}
-                    key={page}
-                    onClick={() => {
-                      handleCloseNavMenu();
-                      handler();
-                    }}
-                  >
-                    {page}
-                  </MenuButton>
-                </Collapse>
-              ))
-            }
+                  {page}
+                </MenuButton>
+              </Collapse>
+            ))}
             <Collapse id="16" orientation="horizontal">
               <Button
                 disableRipple
@@ -328,7 +337,7 @@ function MuiHeader({ displaySize, ...props }) {
             </Collapse>
           </TransitionGroup>
         </div>
-      </AppBar>
+      </Box>
     </ThemeProvider>
   );
 }
