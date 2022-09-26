@@ -177,6 +177,7 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
                 },
                 opacity: 1,
                 borderTopLeftRadius: 4,
+                overflow: "hidden", 
               }}
             >
               {username}
@@ -196,8 +197,9 @@ function Comment({ comment, theme, post, parentSetInteracting, ...props }) {
                   borderBottomRightRadius: 4,
                   boxShadow: replying
                     ? ""
-                    : "0px 0px 1px 0px" + theme.palette.background.shadow,
+                    : "0px 0px 3px 0px" + theme.palette.background.shadow,
                   overflow: "hidden",
+                  transition: "all 0.3s",
                 }}
               >
                 <CommentVoteArea
