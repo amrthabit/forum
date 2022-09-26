@@ -52,9 +52,10 @@ function Post({ theme }) {
           margin: "auto",
           display: "flex",
           flexDirection: "column",
-          gap: 2,
           width: "100%",
-          maxWidth: 740,
+          maxWidth: 742,
+          p: 1,
+          paddingBottom: 0.5,
           borderRadius: 2,
           background: theme.palette.background.commentArea,
           transition: "background 0.3s",
@@ -63,15 +64,18 @@ function Post({ theme }) {
       >
         {message !== "" && message}
         {data?.post && <PostComp post={data.post} theme={theme} isSole />}
-        {commentsData &&
-          commentsData.getPostTopLevelComments.map((comment) => (
-            <Comment
-              key={comment.id}
-              comment={comment}
-              theme={theme}
-              post={data.post}
-            />
-          ))}
+
+        <Box sx={{ marginRight: 1, paddingTop: 0.5 }}>
+          {commentsData &&
+            commentsData.getPostTopLevelComments.map((comment) => (
+              <Comment
+                key={comment.id}
+                comment={comment}
+                theme={theme}
+                post={data.post}
+              />
+            ))}
+        </Box>
       </Box>
     </Box>
   );
