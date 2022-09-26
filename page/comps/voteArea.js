@@ -13,12 +13,7 @@ import {
   useMeQuery,
   useRemoveVoteMutation,
 } from "../src/generated/graphql";
-
-const compact = (number) =>
-  Intl.NumberFormat("en-GB", {
-    notation: "compact",
-    compactDisplay: "short",
-  }).format(number);
+import compact from "../utils/compact";
 
 export default function VoteArea({ post, theme, ...props }) {
   const [{ data: meQuery }] = useMeQuery();

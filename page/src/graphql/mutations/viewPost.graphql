@@ -1,0 +1,3 @@
+mutation ViewPost($postID: Int!) {
+  viewPost(postID: $postID)
+}

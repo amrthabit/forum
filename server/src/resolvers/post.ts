@@ -1,4 +1,5 @@
 import { EntityManager } from "@mikro-orm/postgresql";
+import { Posted } from "../entities/Posted";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { Post } from "../entities/Post";
 import { MyContext } from "../types";
@@ -29,7 +30,7 @@ export class PostResolver {
         desc = false;
         break;
       case "views":
-        orderByRaw = "views";
+        orderByRaw = "view_count";
         break;
       case "comments":
         orderByRaw = "comment_count";
@@ -108,6 +109,7 @@ export class PostResolver {
     if (!post) {
       return false;
     }
+    await em.nativeDelete(Posted, { postID: id });
     await em.nativeDelete(Post, { id });
     return true;
   }
@@ -130,5 +132,35 @@ export class PostResolver {
       return 0;
     }
     return post.upvoteCount - post.downvoteCount;
+  }
+
+  @Mutation(() => Boolean)
+  async viewPost(
+    @Arg("postID", () => Int)
+    postID: number,
+    @Ctx()
+    { em }: MyContext
+  ) {
+    const post = await em.findOne(Post, { id: postID });
+    if (!post) {
+      return false;
+    }
+    post.viewCount++;
+    em.persistAndFlush(post);
+    return true;
+  } 
+
+  @Query(() => Int, { nullable: true })
+  async getPostViews(
+    @Arg("postID", () => Int)
+    postID: number,
+    @Ctx()
+    { em }: MyContext
+  ) {
+    const post = await em.findOne(Post, { id: postID });
+    if (!post) {
+      return null;
+    }
+    return post.viewCount;
   }
 }
