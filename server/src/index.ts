@@ -35,7 +35,7 @@ const main = async () => {
     development: {
       ssl: false,
       port: 4000,
-      hostname: "localhost",
+      hostname: "http://localhost",
       origin: "http://localhost:3000",
     },
   };
@@ -122,7 +122,7 @@ const main = async () => {
 
   server.listen(SERVER_PORT, () => {
     console.log(
-      `Server started on ${config.ssl ? "https" : "http"}://${
+      `Server started on ${
         config.hostname
       }:${config.port}\nAllowing CORS from ${config.origin}`
     );
