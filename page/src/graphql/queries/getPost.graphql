@@ -9,5 +9,6 @@ query GetPost($id: Int!) {
     upvoteCount
     downvoteCount
     viewCount
+    postType
   }
 }

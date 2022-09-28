@@ -86,7 +86,13 @@ function Home({ sort = "top", ...props }) {
           </Box>
           {data &&
             data.getPosts.map((post) => (
-              <Post key={post.id} post={post} theme={theme} showTopComment />
+              <Post
+                key={post.id}
+                post={post}
+                theme={theme}
+                showTopComment
+                {...props}
+              />
             ))}
         </Box>
       </Box>

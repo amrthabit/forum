@@ -19,6 +19,7 @@ export default function Post({ post, theme, isSole, ...props }) {
   const [{ data: meQuery, fetching }] = useMeQuery({
     // pause: isServer,
   });
+
   const [, deletePost] = useDeletePostMutation();
   const [deleting, setDeleting] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
@@ -95,6 +96,7 @@ export default function Post({ post, theme, isSole, ...props }) {
               cursor: isSole ? "auto" : "pointer",
             },
             boxShadow: "0px 0px 2px 1px rgba(0,0,0,0.1)",
+            paddingBottom: 0.5,
           }}
         >
           <VoteArea post={post} theme={theme} />
@@ -119,7 +121,9 @@ export default function Post({ post, theme, isSole, ...props }) {
               <Box
                 sx={{
                   whiteSpace: "nowrap",
-                  flexShrink: 0,
+                  flexShrink: 100,
+                  minWidth: 0,
+                  overflow: "hidden",
                 }}
               >
                 Posted by&nbsp;
@@ -134,7 +138,6 @@ export default function Post({ post, theme, isSole, ...props }) {
                   textDecoration: "underline",
                   transition: "background 0.15s, text-decoration 0.15s",
                   textDecorationColor: "transparent",
-                  // marginRight: 0.3,
                   borderRadius: 1,
                   ":hover": {
                     textDecorationColor: theme.palette.text.primary,
@@ -164,6 +167,7 @@ export default function Post({ post, theme, isSole, ...props }) {
                   color: theme.palette.text.secondary,
                   whiteSpace: "nowrap",
                   flexShrink: 0,
+                  transition: "all 0.3s",
                 }}
               >
                 {compact(post.viewCount)} view{post.viewCount === 1 ? "" : "s"}
@@ -189,35 +193,69 @@ export default function Post({ post, theme, isSole, ...props }) {
             </Box>
           </Box>
           <Box sx={{ gridArea: "contents", marginRight: 1 }}>
-            <Box sx={{ overflowWrap: "anywhere" }}>{post.content}</Box>
+            {post.postType === "text" ? (
+              <Box sx={{ overflowWrap: "anywhere" }}>{post.content}</Box>
+            ) : (
+              <Box
+                sx={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  marginTop: 1,
+                  marginBottom: 1,
+                  borderRadius: 2,
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={post.content}
+                  alt="failed to load"
+                  width="100%"
+                  style={{
+                    height: "100%",
+                    marginBottom: -4,
+                  }}
+                />
+              </Box>
+            )}
           </Box>
-
           <Box
             sx={{
               gridArea: "interact",
-              "> *": {
-                fontSize: 11,
-                height: 30,
-                lineHeight: 30,
-                textAlign: "center",
-              },
+              display: "flex",
+              flexDirection: "row",
+              marginLeft: "auto",
+              marginRight: 1,
             }}
           >
-            <Button
+            <LoadingButton
+              loading={false}
               onClick={handleComment}
               startIcon={
                 <AddCommentIcon
                   style={{
-                    marginRight: -5,
+                    marginRight: -8,
                     transition: "all 0.3s",
                     color: theme.palette.primary.main,
                   }}
                 />
               }
-              sx={{ marginLeft: -0.8, color: theme.palette.text.primary }}
+              sx={{
+                marginLeft: -0.8,
+                color: theme.palette.text.primary,
+                transition: "all 0.3s",
+                fontSize: props.displaySize === "xs" ? 0 : 11,
+                height: 30,
+                lineHeight: 30,
+                textAlign: "center",
+                borderStyle: "solid",
+                borderWidth: "1px",
+                borderColor: theme.palette.background.focus,
+                marginLeft: 0.7,
+                minWidth: 50,
+              }}
             >
-              Comment
-            </Button>
+              &nbsp;Comment
+            </LoadingButton>
             {meQuery?.me?.id === post.posterID || meQuery?.me?.isAdmin ? (
               <>
                 <LoadingButton
@@ -226,7 +264,7 @@ export default function Post({ post, theme, isSole, ...props }) {
                     <DeleteIcon
                       style={{
                         color: theme.palette.text.accent,
-                        marginRight: -7,
+                        marginRight: -10,
                         transition: "all 0.3s",
                       }}
                     />
@@ -235,9 +273,19 @@ export default function Post({ post, theme, isSole, ...props }) {
                   sx={{
                     transition: "all 0.3s",
                     color: theme.palette.text.primary,
+                    transition: "all 0.3s",
+                    fontSize: props.displaySize === "xs" ? 0 : 11,
+                    height: 30,
+                    lineHeight: 30,
+                    textAlign: "center",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                    borderColor: theme.palette.background.focus,
+                    marginLeft: 0.7,
+                    minWidth: 50,
                   }}
                 >
-                  delete
+                  &nbsp;delete
                 </LoadingButton>
                 <Button
                   onClick={(e) => {
@@ -246,15 +294,27 @@ export default function Post({ post, theme, isSole, ...props }) {
                   startIcon={
                     <EditIcon
                       style={{
-                        marginRight: -5,
+                        marginRight: -10,
                         transition: "all 0.3s",
                         color: theme.palette.primary.main,
                       }}
                     />
                   }
-                  sx={{ color: theme.palette.text.primary }}
+                  sx={{
+                    color: theme.palette.text.primary,
+                    transition: "all 0.3s",
+                    fontSize: props.displaySize === "xs" ? 0 : 11,
+                    height: 30,
+                    lineHeight: 30,
+                    textAlign: "center",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                    borderColor: theme.palette.background.focus,
+                    marginLeft: 0.7,
+                    minWidth: 50,
+                  }}
                 >
-                  edit
+                  &nbsp;edit
                 </Button>
               </>
             ) : (
@@ -262,18 +322,31 @@ export default function Post({ post, theme, isSole, ...props }) {
                 startIcon={
                   <FlagIcon
                     style={{
-                      marginRight: -5,
+                      marginRight: -9,
                       transition: "all 0.3s",
                       color: theme.palette.primary.main,
                     }}
                   />
                 }
-                sx={{ marginLeft: 0, color: theme.palette.text.primary }}
+                sx={{
+                  marginLeft: 0,
+                  color: theme.palette.text.primary,
+                  transition: "all 0.3s",
+                  fontSize: props.displaySize === "xs" ? 0 : 11,
+                  height: 30,
+                  lineHeight: 30,
+                  textAlign: "center",
+                  borderStyle: "solid",
+                  borderWidth: "1px",
+                  borderColor: theme.palette.background.focus,
+                  marginLeft: 0.7,
+                  minWidth: 50,
+                }}
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
               >
-                report
+                &nbsp;report
               </Button>
             )}
             <Button
@@ -283,15 +356,27 @@ export default function Post({ post, theme, isSole, ...props }) {
               startIcon={
                 <ShareIcon
                   style={{
-                    marginRight: -5,
+                    marginRight: -9,
                     transition: "all 0.3s",
                     color: theme.palette.primary.main,
                   }}
                 />
               }
-              sx={{ color: theme.palette.text.primary }}
+              sx={{
+                color: theme.palette.text.primary,
+                transition: "all 0.3s",
+                fontSize: props.displaySize === "xs" ? 0 : 11,
+                height: 30,
+                lineHeight: 30,
+                textAlign: "center",
+                borderStyle: "solid",
+                borderWidth: "1px",
+                borderColor: theme.palette.background.focus,
+                marginLeft: 0.7,
+                minWidth: 50,
+              }}
             >
-              share
+              &nbsp;share
             </Button>
           </Box>
         </Box>

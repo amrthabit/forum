@@ -37,7 +37,10 @@ export class Post {
   downvoteCount!: number;
 
   @Field()
-  @Property()  
+  @Property()
   viewCount!: number;
 
+  @Field()
+  @Property({ type: "string", default: "text" })
+  postType!: string;
 }

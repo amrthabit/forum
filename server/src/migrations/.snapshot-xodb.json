@@ -272,6 +272,16 @@
           "primary": false,
           "nullable": false,
           "mappedType": "integer"
+        },
+        "post_type": {
+          "name": "post_type",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "default": "'text'",
+          "mappedType": "string"
         }
       },
       "name": "post",
