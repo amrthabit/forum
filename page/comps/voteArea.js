@@ -189,7 +189,10 @@ export default function VoteArea({ post, theme, ...props }) {
   };
 
   return (
-    <Box sx={{ gridArea: "vote", flexDirection: "column", padding: 1 }}>
+    <Box
+      onClick={(e) => e.stopPropagation()}
+      sx={{ gridArea: "vote", flexDirection: "column", padding: 1 }}
+    >
       <LoadingButton
         loading={upvoting}
         disabled={upvoting || downvoting}

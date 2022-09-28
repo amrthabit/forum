@@ -10,16 +10,15 @@ import msToString from "../../utils/msToString";
 import { useEffect, useState } from "react";
 import Post from "../../comps/post";
 
-function User({ theme }) {
+function User({ theme, ...props }) {
   const router = useRouter();
   const { username } = router.query;
   const [{ data, fetching }] = useGetUserFromUsernameQuery({
     variables: { username: username || "" },
   });
-  const [{ data: postedsData }] =
-    useGetUserPostedsQuery({
-      variables: { posterID: data?.getUserFromUsername?.id || -1 },
-    });
+  const [{ data: postedsData }] = useGetUserPostedsQuery({
+    variables: { posterID: data?.getUserFromUsername?.id || -1 },
+  });
   const [message, setMessage] = useState("Loading...");
 
   useEffect(() => {
@@ -61,10 +60,12 @@ function User({ theme }) {
           width: "100%",
           maxWidth: 740,
         }}
-      > {message}
+      >
+        {" "}
+        {message}
         {postedsData &&
           postedsData.getUserPosteds.map((post) => (
-            <Post post={post} theme={theme} key={post.id} />
+            <Post post={post} theme={theme} key={post.id} {...props} />
           ))}
       </Box>
     </Box>

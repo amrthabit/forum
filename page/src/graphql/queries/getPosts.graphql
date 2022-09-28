@@ -9,5 +9,6 @@ query GetPosts($sort: String!) {
     viewCount
     createdAt
     updatedAt
+    postType
   }
 }

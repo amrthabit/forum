@@ -3,7 +3,7 @@ import { LoadingButton } from "@mui/lab";
 import { Box, Collapse, TextField } from "@mui/material";
 import { withUrqlClient } from "next-urql";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, createRef } from "react";
 import { useField } from "../comps/useField";
 import {
   useCreatePostedMutation,
@@ -11,8 +11,9 @@ import {
   useMeQuery,
 } from "../src/generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
+import SquareButton from "../comps/squareButton";
 
-function Submit(props) {
+function Submit({ currentPostType = "text", ...props }) {
   const router = useRouter();
   const [{ data: meQuery, fetching }] = useMeQuery();
   const [, createPost] = useCreatePostMutation();
@@ -21,6 +22,7 @@ function Submit(props) {
   const theme = props.theme;
 
   const [sending, setSending] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const post = {
     title: useField((value) => value.length < 3), // alphanumeric+`_` starting with letter
@@ -42,13 +44,44 @@ function Submit(props) {
     },
   };
 
+  const imageRef = createRef();
+  const [imageError, setImageError] = useState(false);
+  const [success, setSuccess] = useState(false);
+
   const handleSubmit = async () => {
     setSending(true);
+    if (currentPostType === "image") {
+      if (!imageRef.current?.naturalWidth) {
+        setImageError(true);
+        setSending(false);
+        setErrorMessage("Please link a valid image");
+        return;
+      }
+
+      // image must not be too wide
+      if (imageRef.current.naturalWidth / imageRef.current.naturalHeight > 3) {
+        setImageError(true);
+        setSending(false);
+        setErrorMessage("Image is too wide");
+        return;
+      }
+
+      // image must not be too tall
+      if (imageRef.current.naturalHeight / imageRef.current.naturalWidth > 2) {
+        setImageError(true);
+        setSending(false);
+        setErrorMessage("Image is too tall");
+        return;
+      }
+      setSending(false);
+      setImageError(false);
+    }
 
     const result = await createPost({
       title: post.title.text,
       content: post.content.text,
       posterID: meQuery.me.id,
+      postType: currentPostType,
     });
     if (result.error) {
       console.error("create post error:", result);
@@ -60,13 +93,25 @@ function Submit(props) {
       });
       setTimeout(() => router.push("/"), 2000);
     }
+    setSuccess(true);
+    setErrorMessage("Post submitted successfully. Redirecting...");
 
     setTimeout(() => setSending(false), 200);
   };
 
+  const postTypes = [
+    "text",
+    "image",
+    // todo:
+    // "video",
+    // "link",
+    // "poll",
+    // "chat",
+  ];
+
   return (
     <ThemeProvider theme={theme}>
-      <Box id="posts-column" sx={{ display: "flex", margin: 1 }}>
+      <Box id="posts-column" sx={{ display: "flex", margin: 1, minWidth: 305 }}>
         <Box
           sx={{
             margin: "auto",
@@ -96,13 +141,69 @@ function Submit(props) {
           >
             <Box
               sx={{
+                borderStyle: "solid",
+                borderColor: theme.palette.background.border,
+                borderWidth: 1,
                 boxShadow: `0px 0px 10px ${theme.palette.background.shadow}`,
                 borderRadius: 2,
                 padding: 2,
                 display: "flex",
                 flexDirection: "column",
+                transition: "all 0.3s",
               }}
             >
+              <Box // sorting buttons container
+                sx={{
+                  background: theme.palette.background.paper,
+                  borderColor: theme.palette.background.border,
+                  borderWidth: 1,
+                  borderStyle: "solid",
+                  padding: 1,
+                  borderRadius: 2,
+                  display: "flex",
+                  gap: 1,
+                  ":hover": {
+                    borderColor: theme.palette.background.focus,
+                  },
+                  transition: "all 0.3s",
+                  marginBottom: 0.5,
+                }}
+              >
+                <Box
+                  sx={{
+                    color: theme.palette.text.primary,
+                    transition: "all 0.3s",
+                    display: "flex",
+                    marginTop: -0.4,
+                    marginLeft: 1,
+                    marginRight: 2,
+                  }}
+                >
+                  <p style={{ margin: "auto", whiteSpace: "nowrap" }}>
+                    Post Type:
+                  </p>
+                </Box>
+                {postTypes.map((postType) => (
+                  <SquareButton
+                    key={postType}
+                    theme={theme}
+                    onClick={() => router.push(`/submit/${postType}`)}
+                    loading={false}
+                    interacting={true}
+                    sx={{
+                      width: 100,
+                      height: 30,
+                      ...(postType === currentPostType && {
+                        borderColor: theme.palette.primary.main,
+                      }),
+                      borderRadius: 1,
+                      overflow: "hidden",
+                    }}
+                  >
+                    {postType.toUpperCase()}
+                  </SquareButton>
+                ))}
+              </Box>
               <TextField
                 size="small"
                 name="title"
@@ -121,7 +222,7 @@ function Submit(props) {
               <TextField
                 size="small"
                 name="content"
-                placeholder="text"
+                placeholder={currentPostType === "text" ? "text" : "URL"}
                 margin="dense"
                 value={post.content.text}
                 error={post.content.error}
@@ -130,26 +231,88 @@ function Submit(props) {
                 onFocus={post.set}
                 inputProps={{ maxLength: 300 }}
                 multiline
-                minRows={3}
+                minRows={currentPostType === "text" ? 3 : 1}
                 sx={{
                   width: "100%",
+                  marginBottom: 1.5,
                 }}
               />
-              <LoadingButton
-                onClick={handleSubmit}
-                disabled={post.title.text.length < 3}
-                loading={sending}
-                loadingPosition="end"
-                endIcon={<></>}
+              {currentPostType === "image" && (
+                <Box
+                  sx={{
+                    width: "100%",
+                    maxWidth: "100%",
+                    marginBottom: 1.5,
+                    height:
+                      currentPostType === "text" || !post.content.text
+                        ? 0
+                        : "auto",
+                    borderRadius: 2,
+                    overflow: "hidden",
+                  }}
+                >
+                  <img
+                    src={post.content.text}
+                    alt="invalid url"
+                    width="100%"
+                    ref={imageRef}
+                    style={{
+                      height: "100%",
+                      marginBottom: -4,
+                    }}
+                  />
+                </Box>
+              )}
+              <Box
                 sx={{
-                  width: 130,
-                  marginLeft: "auto",
-                  borderStyle: "solid",
-                  borderWidth: 1,
+                  display: "flex",
+                  flexDirection: "row",
                 }}
               >
-                Submit
-              </LoadingButton>
+                {imageError && (
+                  <Box
+                    sx={{
+                      color: theme.palette.error.main,
+                      fontSize: 18,
+                      marginLeft: 2,
+                      marginTop: 1,
+                      marginBottom: 1,
+                      width: "fit-content",
+                    }}
+                  >
+                    {errorMessage}
+                  </Box>
+                )}
+                {success && (
+                  <Box
+                    sx={{
+                      color: theme.palette.success.main,
+                      fontSize: 18,
+                      marginLeft: 2,
+                      marginTop: 1,
+                      marginBottom: 1,
+                      width: "fit-content",
+                    }}
+                  >
+                    {errorMessage}
+                  </Box>
+                )}
+                <LoadingButton
+                  onClick={handleSubmit}
+                  disabled={post.title.text.length < 3}
+                  loading={sending}
+                  loadingPosition="end"
+                  endIcon={<></>}
+                  sx={{
+                    width: 130,
+                    marginLeft: "auto",
+                    borderStyle: "solid",
+                    borderWidth: 1,
+                  }}
+                >
+                  Submit
+                </LoadingButton>
+              </Box>
             </Box>
           </Collapse>
         </Box>

@@ -9,5 +9,6 @@ query GetUserPosteds($posterID: Int!) {
     viewCount
     createdAt
     updatedAt
+    postType
   }
 }

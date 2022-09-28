@@ -11,7 +11,7 @@ import {
 } from "../../src/generated/graphql";
 import { createUrqlClient } from "../../utils/createUrqlClient";
 
-function Post({ theme }) {
+function Post({ theme, ...props }) {
   const router = useRouter();
   const { postID: rawPostID } = router.query;
 
@@ -88,7 +88,9 @@ function Post({ theme }) {
         }}
       >
         {message !== "" && message}
-        {data?.post && <PostComp post={data.post} theme={theme} isSole />}
+        {data?.post && (
+          <PostComp post={data.post} theme={theme} isSole {...props} />
+        )}
 
         <Box sx={{ marginRight: 1, paddingTop: 0.5 }}>
           {commentsData &&

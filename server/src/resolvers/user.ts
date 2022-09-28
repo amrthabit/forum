@@ -105,6 +105,7 @@ export class UserResolver {
         last_name: newUserLastName,
         created_at: new Date(),
         updated_at: new Date(),
+        is_admin: false,
       })
       .returning("*");
 
