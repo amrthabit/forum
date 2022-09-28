@@ -62,6 +62,7 @@ export class PostResolver {
     @Arg("title") title: string,
     @Arg("content") content: string,
     @Arg("posterID") posterID: number,
+    @Arg("postType") postType: string,
     @Ctx() { em }: MyContext
   ) {
     const response = await (em as EntityManager)
@@ -78,6 +79,7 @@ export class PostResolver {
         view_count: 0,
         created_at: new Date(),
         updated_at: new Date(),
+        post_type: postType,
       })
       .returning("*");
 
@@ -148,7 +150,7 @@ export class PostResolver {
     post.viewCount++;
     em.persistAndFlush(post);
     return true;
-  } 
+  }
 
   @Query(() => Int, { nullable: true })
   async getPostViews(

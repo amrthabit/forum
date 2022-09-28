@@ -113,6 +113,7 @@ export type MutationCreateCommentArgs = {
 
 export type MutationCreatePostArgs = {
   content: Scalars['String'];
+  postType: Scalars['String'];
   posterID: Scalars['Float'];
   title: Scalars['String'];
 };
@@ -200,6 +201,7 @@ export type Post = {
   createdAt: Scalars['String'];
   downvoteCount: Scalars['Float'];
   id: Scalars['Float'];
+  postType: Scalars['String'];
   posterID: Scalars['Float'];
   title: Scalars['String'];
   updatedAt: Scalars['String'];
@@ -412,6 +414,7 @@ export type CreatePostMutationVariables = Exact<{
   title: Scalars['String'];
   content: Scalars['String'];
   posterID: Scalars['Float'];
+  postType: Scalars['String'];
 }>;
 
 
@@ -512,7 +515,7 @@ export type GetPostQueryVariables = Exact<{
 }>;
 
 
-export type GetPostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number } | null };
+export type GetPostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, postType: string } | null };
 
 export type GetPostScoreQueryVariables = Exact<{
   postID: Scalars['Int'];
@@ -554,7 +557,7 @@ export type GetPostsQueryVariables = Exact<{
 }>;
 
 
-export type GetPostsQuery = { __typename?: 'Query', getPosts: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string }> };
+export type GetPostsQuery = { __typename?: 'Query', getPosts: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string, postType: string }> };
 
 export type GetUserCommentVotesQueryVariables = Exact<{
   voterID: Scalars['Int'];
@@ -575,7 +578,7 @@ export type GetUserPostedsQueryVariables = Exact<{
 }>;
 
 
-export type GetUserPostedsQuery = { __typename?: 'Query', getUserPosteds: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string }> };
+export type GetUserPostedsQuery = { __typename?: 'Query', getUserPosteds: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string, postType: string }> };
 
 export type GetUserVoteOnCommentQueryVariables = Exact<{
   commentID: Scalars['Int'];
@@ -666,8 +669,13 @@ export function useCreateCommentMutation() {
   return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
 };
 export const CreatePostDocument = gql`
-    mutation CreatePost($title: String!, $content: String!, $posterID: Float!) {
-  createPost(title: $title, content: $content, posterID: $posterID) {
+    mutation CreatePost($title: String!, $content: String!, $posterID: Float!, $postType: String!) {
+  createPost(
+    title: $title
+    content: $content
+    posterID: $posterID
+    postType: $postType
+  ) {
     id
   }
 }
@@ -845,6 +853,7 @@ export const GetPostDocument = gql`
     upvoteCount
     downvoteCount
     viewCount
+    postType
   }
 }
     `;
@@ -938,6 +947,7 @@ export const GetPostsDocument = gql`
     viewCount
     createdAt
     updatedAt
+    postType
   }
 }
     `;
@@ -984,6 +994,7 @@ export const GetUserPostedsDocument = gql`
     viewCount
     createdAt
     updatedAt
+    postType
   }
 }
     `;
