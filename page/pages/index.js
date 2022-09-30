@@ -16,87 +16,83 @@ function Home({ sort = "top", ...props }) {
   // todo: add sorting by comments
   const availableSorts = ["top", "new", "views", "random"];
   return (
-    <ThemeProvider theme={theme}>
+    <Box sx={{ display: "flex", margin: 1, paddingBottom: 5, minWidth: 305 }}>
       <Box
         id="posts-column"
-        sx={{ display: "flex", margin: 1, paddingBottom: 5, minWidth: 305 }}
+        sx={{
+          margin: "auto",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+          width: "100%",
+          maxWidth: 740,
+        }}
       >
-        <Box
+        <Box // sorting buttons container
           sx={{
-            margin: "auto",
+            background: theme.palette.background.paper,
+            borderColor: theme.palette.background.border,
+            borderWidth: 1,
+            borderStyle: "solid",
+            padding: 1,
+            borderRadius: 2,
             display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            width: "100%",
-            maxWidth: 740,
+            gap: 1,
+            ":hover": {
+              borderColor: theme.palette.background.focus,
+            },
+            transition: "all 0.3s",
           }}
         >
-          <Box // sorting buttons container
+          <Box
             sx={{
-              background: theme.palette.background.paper,
-              borderColor: theme.palette.background.border,
-              borderWidth: 1,
-              borderStyle: "solid",
-              padding: 1,
-              borderRadius: 2,
-              display: "flex",
-              gap: 1,
-              ":hover": {
-                borderColor: theme.palette.background.focus,
-              },
+              color: theme.palette.text.primary,
               transition: "all 0.3s",
+              display: "flex",
+              marginTop: -0.4,
+              marginLeft: 1,
+              marginRight: 2,
             }}
           >
-            <Box
-              sx={{
-                color: theme.palette.text.primary,
-                transition: "all 0.3s",
-                display: "flex",
-                marginTop: -0.4,
-                marginLeft: 1,
-                marginRight: 2,
-              }}
-            >
-              <p style={{ margin: "auto", whiteSpace: "nowrap" }}>Sort by</p>
-            </Box>
-            {availableSorts.map(
-              (
-                sortType // sorting buttons
-              ) => (
-                <SquareButton
-                  key={sortType}
-                  theme={theme}
-                  onClick={() => router.push(`/${sortType}`)}
-                  loading={false}
-                  interacting={true}
-                  sx={{
-                    width: 100,
-                    height: 30,
-                    ...(sortType === sort && {
-                      borderColor: theme.palette.primary.main,
-                    }),
-                    borderRadius: 1,
-                    overflow: "hidden",
-                  }}
-                >
-                  {sortType.toUpperCase()}
-                </SquareButton>
-              )
-            )}
+            <p style={{ margin: "auto", whiteSpace: "nowrap" }}>Sort by</p>
           </Box>
-          {data &&
-            data.getPosts.map((post) => (
-              <Post
-                key={post.id}
-                post={post}
+          {availableSorts.map(
+            (
+              sortType // sorting buttons
+            ) => (
+              <SquareButton
+                key={sortType}
                 theme={theme}
-                showTopComment
-                {...props}
-              />
-            ))}
+                onClick={() => router.push(`/${sortType}`)}
+                loading={false}
+                interacting={true}
+                sx={{
+                  width: 100,
+                  height: 30,
+                  ...(sortType === sort && {
+                    borderColor: theme.palette.primary.main,
+                  }),
+                  borderRadius: 1,
+                  overflow: "hidden",
+                }}
+              >
+                {sortType.toUpperCase()}
+              </SquareButton>
+            )
+          )}
         </Box>
+        {data &&
+          data.getPosts.map((post) => (
+            <Post
+              key={post.id}
+              post={post}
+              theme={theme}
+              showTopComment
+              {...props}
+            />
+          ))}
       </Box>
-    </ThemeProvider>
+    </Box>
   );
 }
 
