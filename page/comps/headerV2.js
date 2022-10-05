@@ -283,6 +283,8 @@ function MuiHeader({ displaySize, ...props }) {
             ))}
             <Collapse id="16" orientation="horizontal">
               <Button
+                id="switch theme"
+                aria-label="switch theme button"
                 disableRipple
                 onClick={theme.switchTheme}
                 sx={{
