@@ -194,7 +194,9 @@ export default function Post({ post, theme, isSole, ...props }) {
           </Box>
           <Box sx={{ gridArea: "contents", marginRight: 1 }}>
             {post.postType === "text" ? (
-              <Box sx={{ overflowWrap: "anywhere" }}>{post.content}</Box>
+              <Box sx={{ overflowWrap: "anywhere", marginBottom: 1 }}>
+                {post.content}
+              </Box>
             ) : (
               <Box
                 sx={{
