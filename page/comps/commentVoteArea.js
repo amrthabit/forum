@@ -245,7 +245,11 @@ export default function CommentVoteArea({
           interacting={props.interacting}
           onClick={() => {}}
           sx={{
-            color: didUpvote ? "#ff4000" : didDownvote ? "#af40eb" : theme.palette.text.primary,
+            color: didUpvote
+              ? "#ff4000"
+              : didDownvote
+              ? "#af40eb"
+              : theme.palette.text.primary,
             width: replying ? 0 : props.interacting ? 40 : 40,
             height: replying ? 40 : 17,
             cursor: "default",
@@ -321,10 +325,10 @@ export default function CommentVoteArea({
           interacting={props.interacting}
           sx={{
             width: replying || !props.interacting ? 0 : 30,
-            ...(upvotingAfterEffect && {
-              background: upvoteColor,
+            ...(downvotingAfterEffect && {
+              background: downvoteColor,
               "&:hover, &:active": {
-                background: upvoteColor,
+                background: downvoteColor,
               },
             }),
           }}
