@@ -228,11 +228,11 @@ function MuiHeader({ displaySize, ...props }) {
                 marginRight: 1,
                 marginLeft: 1,
                 fontSize: 20,
-                width: 40,
+                width: 90,
                 height: 36,
               }}
             >
-              XOXO
+              Forum
             </MenuButton>
             <Box
               sx={{
