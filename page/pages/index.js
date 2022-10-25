@@ -4,27 +4,45 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import Post from "../comps/post";
 import SquareButton from "../comps/squareButton";
-import { useGetPostsQuery } from "../src/generated/graphql";
+import {
+  useGetAllCliquesQuery,
+  useGetPostsQuery,
+} from "../src/generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
+import CliqueSidebar from "../comps/cliqueSidebar";
 
-function Home({ sort = "top", ...props }) {
+function Home({ sort = "top", displaySize, ...props }) {
   const [{ data }] = useGetPostsQuery({
     variables: { sort },
   });
+  const [{ data: allCliquesData }] = useGetAllCliquesQuery();
+
   const theme = props.theme;
   const router = useRouter();
+
   // todo: add sorting by comments
   const availableSorts = ["top", "new", "views", "random"];
   return (
-    <Box sx={{ display: "flex", margin: 1, paddingBottom: 5, minWidth: 305 }}>
+    <Box
+      sx={{
+        display: "flex",
+        margin: 1,
+        paddingBottom: 5,
+        minWidth: 305,
+        gap: 1,
+      }}
+    >
       <Box
         id="posts-column"
         sx={{
-          margin: "auto",
+          marginLeft: "auto",
           display: "flex",
           flexDirection: "column",
           gap: 2,
-          width: "100%",
+          width: ["xl", "lg"].includes(displaySize) ? "80%" : "100%",
+          transition: `width 0.5s ease ${
+            ["xl", "lg"].includes(displaySize) ? "0s" : "0.3s"
+          }`,
           maxWidth: 740,
         }}
       >
@@ -89,6 +107,44 @@ function Home({ sort = "top", ...props }) {
               theme={theme}
               showTopComment
               {...props}
+            />
+          ))}
+      </Box>
+      <Box
+        id="cliques-column"
+        sx={{
+          padding: 0,
+          marginRight: "auto",
+          display: "flex",
+          flexDirection: "column",
+          borderRadius: 2,
+          width: ["xl", "lg"].includes(displaySize) ? "20%" : "0%",
+          overflow: "hidden",
+          maxWidth: 200,
+          minWidth: 0,
+          background: theme.palette.background.paper,
+          borderColor: theme.palette.background.border,
+          borderWidth: ["xl", "lg"].includes(displaySize) ? 1 : 0,
+          borderStyle: "solid",
+          display: "flex",
+          gap: 0.3,
+          ":hover": {
+            borderColor: theme.palette.background.focus,
+          },
+          transition:
+            "width 0.5s, background-color 0.3s, opacity 0.3s, border-color 0.3s, color 0.3s",
+          color: theme.palette.text.primary,
+          px: ["xl", "lg"].includes(displaySize) ? 1.5 : 0,
+          opacity: ["xl", "lg"].includes(displaySize) ? 1 : 0,
+        }}
+      >
+        <Box sx={{ my: 1 }}>Recent cliques</Box>
+        {allCliquesData?.getAllCliques &&
+          allCliquesData.getAllCliques.map((clique) => (
+            <CliqueSidebar
+              key={clique.cliqueID}
+              clique={clique}
+              theme={theme}
             />
           ))}
       </Box>

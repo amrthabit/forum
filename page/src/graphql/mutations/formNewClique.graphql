@@ -1,0 +1,6 @@
+mutation FormNewClique($cliqueID: String!, $description: String!) {
+  formNewClique(cliqueID: $cliqueID, description: $description) {
+    status
+    message
+  }
+}

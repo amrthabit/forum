@@ -21,7 +21,10 @@ import useDeviceSize from "./useDeviceSize";
 import { Box } from "@mui/material";
 
 // todo: abstract sizing thing
-const pagesLeft = [["create post", "/submit"]];
+const pagesLeft = [
+  ["create post", "/submit"],
+  ["form clique", "/newclique"],
+];
 
 const HamburgerMenu = (props) => (
   <>
@@ -236,7 +239,7 @@ function MuiHeader({ displaySize, ...props }) {
             </MenuButton>
             <Box
               sx={{
-                width: ["md", "lg", "xl"].includes(displaySize) ? 110 : 0,
+                width: ["md", "lg", "xl"].includes(displaySize) ? 240 : 0,
                 transition: "all 0.3s",
                 margin: "auto",
                 display: "flex",

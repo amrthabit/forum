@@ -43,4 +43,8 @@ export class Post {
   @Field()
   @Property({ type: "string", default: "text" })
   postType!: string;
+
+  @Field(() => String)
+  @Property({ type: "text", default: "forum" })
+  postClique: string;
 }

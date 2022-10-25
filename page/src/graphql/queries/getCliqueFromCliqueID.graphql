@@ -1,0 +1,6 @@
+query GetCliqueFromCliqueID($cliqueID: String!) {
+  getCliqueFromCliqueID(cliqueID: $cliqueID) {
+    id
+    cliqueID
+  }
+}

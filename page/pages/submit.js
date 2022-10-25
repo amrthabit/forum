@@ -25,7 +25,8 @@ function Submit({ currentPostType = "text", ...props }) {
   const [errorMessage, setErrorMessage] = useState("");
 
   const post = {
-    title: useField((value) => value.length < 3), // alphanumeric+`_` starting with letter
+    title: useField((value) => value.length < 3),
+    clique: useField((value) => !/^([A-Za-z][A-Za-z_\d]+)$/.test(value)), // alphanumeric+`_` starting with letter
     content: useField(() => false),
     set: (e) => {
       post[e.target.name].set(e.target.value);
@@ -82,9 +83,12 @@ function Submit({ currentPostType = "text", ...props }) {
       content: post.content.text,
       posterID: meQuery.me.id,
       postType: currentPostType,
+      clique: post.clique.text,
     });
     if (result.error) {
       console.error("create post error:", result);
+    } else if (!result.data.createPost) {
+      setErrorMessage("Clique does not exist.");
     } else {
       post.reset();
       await createPosted({
@@ -92,9 +96,9 @@ function Submit({ currentPostType = "text", ...props }) {
         posterID: meQuery.me.id,
       });
       setTimeout(() => router.push("/"), 2000);
+      setErrorMessage("Post submitted successfully. Redirecting...");
+      setSuccess(true);
     }
-    setSuccess(true);
-    setErrorMessage("Post submitted successfully. Redirecting...");
 
     setTimeout(() => setSending(false), 200);
   };
@@ -206,6 +210,21 @@ function Submit({ currentPostType = "text", ...props }) {
               </Box>
               <TextField
                 size="small"
+                name="clique"
+                placeholder="clique"
+                margin="dense"
+                value={post.clique.text}
+                error={post.clique.error}
+                onChange={post.set}
+                onBlur={post.set}
+                onFocus={post.set}
+                inputProps={{ maxLength: 300 }}
+                sx={{
+                  width: "100%",
+                }}
+              />
+              <TextField
+                size="small"
                 name="title"
                 placeholder="Title"
                 margin="dense"
@@ -283,20 +302,20 @@ function Submit({ currentPostType = "text", ...props }) {
                     {errorMessage}
                   </Box>
                 )}
-                {success && (
-                  <Box
-                    sx={{
-                      color: theme.palette.success.main,
-                      fontSize: 18,
-                      marginLeft: 2,
-                      marginTop: 1,
-                      marginBottom: 1,
-                      width: "fit-content",
-                    }}
-                  >
-                    {errorMessage}
-                  </Box>
-                )}
+                <Box
+                  sx={{
+                    color: success
+                      ? theme.palette.success.main
+                      : theme.palette.error.main,
+                    fontSize: 18,
+                    marginLeft: 2,
+                    marginTop: 1,
+                    marginBottom: 1,
+                    width: "fit-content",
+                  }}
+                >
+                  {errorMessage}
+                </Box>
                 <LoadingButton
                   onClick={handleSubmit}
                   disabled={post.title.text.length < 3}

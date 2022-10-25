@@ -1,6 +1,7 @@
 import { MikroORM } from "@mikro-orm/core";
 import dotenv from "dotenv";
 import path from "path";
+import { Clique } from "./entities/Clique";
 import { Comment } from "./entities/Comment";
 import { CommentVote } from "./entities/CommentVote";
 import { Post } from "./entities/Post";
@@ -16,7 +17,7 @@ export default {
     path: path.join(__dirname, "./migrations"), // path to the folder with migrations
     glob: "!(*.d).{js,ts}", // match migration files (all .js and .ts files, but not .d.ts)
   },
-  entities: [Post, User, Posted, Vote, Comment, CommentVote],
+  entities: [Post, User, Posted, Vote, Comment, CommentVote, Clique],
   allowGlobalContext: true,
   dbName: process.env.DATABASE_NAME,
   debug: !__prod__,

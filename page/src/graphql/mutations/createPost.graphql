@@ -3,12 +3,14 @@ mutation CreatePost(
   $content: String!
   $posterID: Float!
   $postType: String!
+  $clique: String
 ) {
   createPost(
     title: $title
     content: $content
     posterID: $posterID
     postType: $postType
+    clique: $clique
   ) {
     id
   }

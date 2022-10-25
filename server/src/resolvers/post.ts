@@ -3,6 +3,7 @@ import { Posted } from "../entities/Posted";
 import { Arg, Ctx, Int, Mutation, Query, Resolver } from "type-graphql";
 import { Post } from "../entities/Post";
 import { MyContext } from "../types";
+import { Clique } from "../entities/Clique";
 
 @Resolver()
 export class PostResolver {
@@ -10,6 +11,8 @@ export class PostResolver {
   async getPosts(
     @Arg("sort", () => String, { nullable: true })
     sort: string,
+    @Arg("clique", () => String, { nullable: true })
+    rawClique: string,
     @Ctx() { em }: MyContext
   ) {
     let orderByRaw = "upvote_count - downvote_count";
@@ -43,10 +46,12 @@ export class PostResolver {
         orderByRaw = "upvote_count - downvote_count";
         break;
     }
+    let clique = rawClique;
+    console.log(clique);
 
     const res = await em.find(
       Post,
-      {}, // all}
+      clique ? { postClique: clique } : {}, //
       { orderBy: { [`(${orderByRaw})`]: desc ? "DESC" : "" } as any }
     );
     return res;
@@ -57,14 +62,22 @@ export class PostResolver {
     return await em.findOne(Post, { id });
   }
 
-  @Mutation(() => Post)
+  @Mutation(() => Post, { nullable: true })
   async createPost(
     @Arg("title") title: string,
     @Arg("content") content: string,
     @Arg("posterID") posterID: number,
     @Arg("postType") postType: string,
+    @Arg("clique", () => String, { nullable: true }) clique: string,
     @Ctx() { em }: MyContext
   ) {
+    if (clique) {
+      const cliqueExists = await em.findOne(Clique, { cliqueID: clique });
+      if (!cliqueExists) {
+        return null;
+      }
+    }
+
     const response = await (em as EntityManager)
       .createQueryBuilder(Post)
       .getKnexQuery()
@@ -80,6 +93,7 @@ export class PostResolver {
         created_at: new Date(),
         updated_at: new Date(),
         post_type: postType,
+        post_clique: clique || "forum",
       })
       .returning("*");
 
