@@ -1,6 +1,8 @@
 import { MikroORM } from "@mikro-orm/core";
-import { ApolloServerPluginLandingPageGraphQLPlayground } from "apollo-server-core";
-import { ApolloServerPluginLandingPageDisabled } from "apollo-server-core";
+import {
+  ApolloServerPluginLandingPageDisabled,
+  ApolloServerPluginLandingPageGraphQLPlayground,
+} from "apollo-server-core";
 import { ApolloServer } from "apollo-server-express";
 import connectRedis from "connect-redis";
 import cookieParser from "cookie-parser";
@@ -15,6 +17,7 @@ import Redis from "ioredis";
 import { buildSchema } from "type-graphql";
 import { COOKIE_NAME, HOST, SERVER_PORT } from "./constants";
 import mikroOrmConfig from "./mikro-orm.config";
+import { CliqueResolver } from "./resolvers/clique";
 import { CommentResolver } from "./resolvers/comment";
 import { CommentVoteResolver } from "./resolvers/commentVote";
 import { HelloResolver } from "./resolvers/hello";
@@ -85,6 +88,7 @@ const main = async () => {
         VoteResolver,
         CommentResolver,
         CommentVoteResolver,
+        CliqueResolver,
       ],
       validate: false,
     }),
@@ -107,12 +111,8 @@ const main = async () => {
     // are secured.
     server = https.createServer(
       {
-        cert: fs.readFileSync(
-          process.env.PATH_TO_CERTIFICATE as string,
-        ),
-        key: fs.readFileSync(
-          process.env.PATH_TO_KEY as string
-        ),
+        cert: fs.readFileSync(process.env.PATH_TO_CERTIFICATE as string),
+        key: fs.readFileSync(process.env.PATH_TO_KEY as string),
       },
       app
     );

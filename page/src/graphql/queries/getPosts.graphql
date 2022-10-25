@@ -1,5 +1,5 @@
-query GetPosts($sort: String!) {
-  getPosts(sort: $sort) {
+query GetPosts($sort: String, $clique: String) {
+  getPosts(sort: $sort, clique: $clique) {
     id
     title
     content
@@ -10,5 +10,6 @@ query GetPosts($sort: String!) {
     createdAt
     updatedAt
     postType
+    postClique
   }
 }

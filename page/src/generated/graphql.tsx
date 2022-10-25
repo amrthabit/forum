@@ -15,6 +15,23 @@ export type Scalars = {
   Float: number;
 };
 
+export type Clique = {
+  __typename?: 'Clique';
+  cliqueID: Scalars['String'];
+  createdAt: Scalars['String'];
+  description: Scalars['String'];
+  id: Scalars['Float'];
+  status: Scalars['String'];
+  updatedAt: Scalars['String'];
+};
+
+export type CliqueStatus = {
+  __typename?: 'CliqueStatus';
+  clique?: Maybe<Clique>;
+  message: Scalars['String'];
+  status: Scalars['String'];
+};
+
 export type Comment = {
   __typename?: 'Comment';
   commenterID: Scalars['Float'];
@@ -55,15 +72,18 @@ export type Mutation = {
   createComment: Comment;
   createPost: Post;
   createPosted: Scalars['Boolean'];
+  deleteAllCliques: Array<Clique>;
   deleteAllComments: Scalars['Boolean'];
   deleteAllPosteds: Array<Posted>;
   deleteAllPosts: Scalars['Boolean'];
   deleteAllUsers: Array<User>;
+  deleteClique: Scalars['Boolean'];
   deleteComment: Scalars['Boolean'];
   deletePost: Scalars['Boolean'];
   deletePosted: Scalars['Boolean'];
   deleteUser: Scalars['Boolean'];
   forgotPassword: Scalars['Boolean'];
+  formNewClique: CliqueStatus;
   login: LoginStatus;
   logout: Scalars['Boolean'];
   register: LoginStatus;
@@ -112,6 +132,7 @@ export type MutationCreateCommentArgs = {
 
 
 export type MutationCreatePostArgs = {
+  clique?: InputMaybe<Scalars['String']>;
   content: Scalars['String'];
   postType: Scalars['String'];
   posterID: Scalars['Float'];
@@ -122,6 +143,11 @@ export type MutationCreatePostArgs = {
 export type MutationCreatePostedArgs = {
   postID: Scalars['Float'];
   posterID: Scalars['Float'];
+};
+
+
+export type MutationDeleteCliqueArgs = {
+  cliqueID: Scalars['String'];
 };
 
 
@@ -147,6 +173,12 @@ export type MutationDeleteUserArgs = {
 
 export type MutationForgotPasswordArgs = {
   email: Scalars['String'];
+};
+
+
+export type MutationFormNewCliqueArgs = {
+  cliqueID: Scalars['String'];
+  description: Scalars['String'];
 };
 
 
@@ -201,6 +233,7 @@ export type Post = {
   createdAt: Scalars['String'];
   downvoteCount: Scalars['Float'];
   id: Scalars['Float'];
+  postClique: Scalars['String'];
   postType: Scalars['String'];
   posterID: Scalars['Float'];
   title: Scalars['String'];
@@ -220,8 +253,11 @@ export type Query = {
   __typename?: 'Query';
   comment?: Maybe<Comment>;
   comments: Array<Comment>;
+  getAllCliques: Array<Clique>;
   getAllCommentVotes: Array<CommentVote>;
   getAllVotes: Array<Vote>;
+  getCliqueByID?: Maybe<Clique>;
+  getCliqueFromCliqueID?: Maybe<Clique>;
   getCommentChildren: Array<Comment>;
   getCommentScore: Scalars['Int'];
   getCommentVotes: Array<CommentVote>;
@@ -249,6 +285,16 @@ export type Query = {
 
 export type QueryCommentArgs = {
   id: Scalars['Int'];
+};
+
+
+export type QueryGetCliqueByIdArgs = {
+  id: Scalars['Int'];
+};
+
+
+export type QueryGetCliqueFromCliqueIdArgs = {
+  cliqueID: Scalars['String'];
 };
 
 
@@ -293,6 +339,7 @@ export type QueryGetPostVotesArgs = {
 
 
 export type QueryGetPostsArgs = {
+  clique?: InputMaybe<Scalars['String']>;
   sort?: InputMaybe<Scalars['String']>;
 };
 
@@ -415,6 +462,7 @@ export type CreatePostMutationVariables = Exact<{
   content: Scalars['String'];
   posterID: Scalars['Float'];
   postType: Scalars['String'];
+  clique?: InputMaybe<Scalars['String']>;
 }>;
 
 
@@ -434,6 +482,14 @@ export type DeletePostMutationVariables = Exact<{
 
 
 export type DeletePostMutation = { __typename?: 'Mutation', deletePost: boolean };
+
+export type FormNewCliqueMutationVariables = Exact<{
+  cliqueID: Scalars['String'];
+  description: Scalars['String'];
+}>;
+
+
+export type FormNewCliqueMutation = { __typename?: 'Mutation', formNewClique: { __typename?: 'CliqueStatus', status: string, message: string } };
 
 export type LoginMutationVariables = Exact<{
   userName: Scalars['String'];
@@ -482,6 +538,18 @@ export type ViewPostMutationVariables = Exact<{
 
 export type ViewPostMutation = { __typename?: 'Mutation', viewPost: boolean };
 
+export type GetAllCliquesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAllCliquesQuery = { __typename?: 'Query', getAllCliques: Array<{ __typename?: 'Clique', id: number, cliqueID: string, description: string, createdAt: string, status: string }> };
+
+export type GetCliqueFromCliqueIdQueryVariables = Exact<{
+  cliqueID: Scalars['String'];
+}>;
+
+
+export type GetCliqueFromCliqueIdQuery = { __typename?: 'Query', getCliqueFromCliqueID?: { __typename?: 'Clique', id: number, cliqueID: string } | null };
+
 export type GetCommentByIdQueryVariables = Exact<{
   id: Scalars['Int'];
 }>;
@@ -515,7 +583,7 @@ export type GetPostQueryVariables = Exact<{
 }>;
 
 
-export type GetPostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, postType: string } | null };
+export type GetPostQuery = { __typename?: 'Query', post?: { __typename?: 'Post', id: number, createdAt: string, updatedAt: string, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, postType: string, postClique: string } | null };
 
 export type GetPostScoreQueryVariables = Exact<{
   postID: Scalars['Int'];
@@ -553,11 +621,12 @@ export type GetPostVotesQueryVariables = Exact<{
 export type GetPostVotesQuery = { __typename?: 'Query', getPostVotes: Array<{ __typename?: 'Vote', id: number, voteType: number }> };
 
 export type GetPostsQueryVariables = Exact<{
-  sort: Scalars['String'];
+  sort?: InputMaybe<Scalars['String']>;
+  clique?: InputMaybe<Scalars['String']>;
 }>;
 
 
-export type GetPostsQuery = { __typename?: 'Query', getPosts: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string, postType: string }> };
+export type GetPostsQuery = { __typename?: 'Query', getPosts: Array<{ __typename?: 'Post', id: number, title: string, content: string, posterID: number, upvoteCount: number, downvoteCount: number, viewCount: number, createdAt: string, updatedAt: string, postType: string, postClique: string }> };
 
 export type GetUserCommentVotesQueryVariables = Exact<{
   voterID: Scalars['Int'];
@@ -669,12 +738,13 @@ export function useCreateCommentMutation() {
   return Urql.useMutation<CreateCommentMutation, CreateCommentMutationVariables>(CreateCommentDocument);
 };
 export const CreatePostDocument = gql`
-    mutation CreatePost($title: String!, $content: String!, $posterID: Float!, $postType: String!) {
+    mutation CreatePost($title: String!, $content: String!, $posterID: Float!, $postType: String!, $clique: String) {
   createPost(
     title: $title
     content: $content
     posterID: $posterID
     postType: $postType
+    clique: $clique
   ) {
     id
   }
@@ -701,6 +771,18 @@ export const DeletePostDocument = gql`
 
 export function useDeletePostMutation() {
   return Urql.useMutation<DeletePostMutation, DeletePostMutationVariables>(DeletePostDocument);
+};
+export const FormNewCliqueDocument = gql`
+    mutation FormNewClique($cliqueID: String!, $description: String!) {
+  formNewClique(cliqueID: $cliqueID, description: $description) {
+    status
+    message
+  }
+}
+    `;
+
+export function useFormNewCliqueMutation() {
+  return Urql.useMutation<FormNewCliqueMutation, FormNewCliqueMutationVariables>(FormNewCliqueDocument);
 };
 export const LoginDocument = gql`
     mutation Login($userName: String!, $password: String!) {
@@ -775,6 +857,33 @@ export const ViewPostDocument = gql`
 
 export function useViewPostMutation() {
   return Urql.useMutation<ViewPostMutation, ViewPostMutationVariables>(ViewPostDocument);
+};
+export const GetAllCliquesDocument = gql`
+    query GetAllCliques {
+  getAllCliques {
+    id
+    cliqueID
+    description
+    createdAt
+    status
+  }
+}
+    `;
+
+export function useGetAllCliquesQuery(options?: Omit<Urql.UseQueryArgs<GetAllCliquesQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetAllCliquesQuery, GetAllCliquesQueryVariables>({ query: GetAllCliquesDocument, ...options });
+};
+export const GetCliqueFromCliqueIdDocument = gql`
+    query GetCliqueFromCliqueID($cliqueID: String!) {
+  getCliqueFromCliqueID(cliqueID: $cliqueID) {
+    id
+    cliqueID
+  }
+}
+    `;
+
+export function useGetCliqueFromCliqueIdQuery(options: Omit<Urql.UseQueryArgs<GetCliqueFromCliqueIdQueryVariables>, 'query'>) {
+  return Urql.useQuery<GetCliqueFromCliqueIdQuery, GetCliqueFromCliqueIdQueryVariables>({ query: GetCliqueFromCliqueIdDocument, ...options });
 };
 export const GetCommentByIdDocument = gql`
     query GetCommentByID($id: Int!) {
@@ -854,6 +963,7 @@ export const GetPostDocument = gql`
     downvoteCount
     viewCount
     postType
+    postClique
   }
 }
     `;
@@ -936,8 +1046,8 @@ export function useGetPostVotesQuery(options: Omit<Urql.UseQueryArgs<GetPostVote
   return Urql.useQuery<GetPostVotesQuery, GetPostVotesQueryVariables>({ query: GetPostVotesDocument, ...options });
 };
 export const GetPostsDocument = gql`
-    query GetPosts($sort: String!) {
-  getPosts(sort: $sort) {
+    query GetPosts($sort: String, $clique: String) {
+  getPosts(sort: $sort, clique: $clique) {
     id
     title
     content
@@ -948,11 +1058,12 @@ export const GetPostsDocument = gql`
     createdAt
     updatedAt
     postType
+    postClique
   }
 }
     `;
 
-export function useGetPostsQuery(options: Omit<Urql.UseQueryArgs<GetPostsQueryVariables>, 'query'>) {
+export function useGetPostsQuery(options?: Omit<Urql.UseQueryArgs<GetPostsQueryVariables>, 'query'>) {
   return Urql.useQuery<GetPostsQuery, GetPostsQueryVariables>({ query: GetPostsDocument, ...options });
 };
 export const GetUserCommentVotesDocument = gql`

@@ -153,12 +153,35 @@ export default function Post({ post, theme, isSole, ...props }) {
               </Box>
               <Box
                 sx={{
-                  marginRight: "auto",
                   whiteSpace: "nowrap",
                   flexShrink: 0,
                 }}
               >
-                &nbsp;{readableTime} ago
+                &nbsp;{readableTime} ago at&nbsp;
+              </Box>
+              <Box
+                component="strong"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/clique/${post.postClique}`);
+                }}
+                sx={{
+                  textDecoration: "underline",
+                  transition: "background 0.15s, text-decoration 0.15s",
+                  textDecorationColor: "transparent",
+                  borderRadius: 1,
+                  ":hover": {
+                    textDecorationColor: theme.palette.text.primary,
+                    background: theme.palette.background.hover,
+                    cursor: "pointer",
+                  },
+                  overflow: "hidden",
+                  flexShrink: 1,
+                  minWidth: 0,
+                  marginRight: "auto",
+                }}
+              >
+                {post.postClique}
               </Box>
               <Box
                 sx={{
@@ -194,7 +217,9 @@ export default function Post({ post, theme, isSole, ...props }) {
           </Box>
           <Box sx={{ gridArea: "contents", marginRight: 1 }}>
             {post.postType === "text" ? (
-              <Box sx={{ overflowWrap: "anywhere" }}>{post.content}</Box>
+              <Box sx={{ overflowWrap: "anywhere", marginBottom: 1 }}>
+                {post.content}
+              </Box>
             ) : (
               <Box
                 sx={{
@@ -225,6 +250,7 @@ export default function Post({ post, theme, isSole, ...props }) {
               flexDirection: "row",
               marginLeft: "auto",
               marginRight: 1,
+              overflow:"hidden"
             }}
           >
             <LoadingButton

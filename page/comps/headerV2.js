@@ -21,7 +21,10 @@ import useDeviceSize from "./useDeviceSize";
 import { Box } from "@mui/material";
 
 // todo: abstract sizing thing
-const pagesLeft = [["create post", "/submit"]];
+const pagesLeft = [
+  ["create post", "/submit"],
+  ["form clique", "/newclique"],
+];
 
 const HamburgerMenu = (props) => (
   <>
@@ -228,15 +231,15 @@ function MuiHeader({ displaySize, ...props }) {
                 marginRight: 1,
                 marginLeft: 1,
                 fontSize: 20,
-                width: 40,
+                width: 90,
                 height: 36,
               }}
             >
-              XOXO
+              Forum
             </MenuButton>
             <Box
               sx={{
-                width: ["md", "lg", "xl"].includes(displaySize) ? 110 : 0,
+                width: ["md", "lg", "xl"].includes(displaySize) ? 240 : 0,
                 transition: "all 0.3s",
                 margin: "auto",
                 display: "flex",
@@ -283,6 +286,8 @@ function MuiHeader({ displaySize, ...props }) {
             ))}
             <Collapse id="16" orientation="horizontal">
               <Button
+                id="switch theme"
+                aria-label="switch theme button"
                 disableRipple
                 onClick={theme.switchTheme}
                 sx={{

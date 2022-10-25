@@ -1,0 +1,9 @@
+query GetAllCliques {
+  getAllCliques {
+    id
+    cliqueID
+    description
+    createdAt
+    status
+  }
+}

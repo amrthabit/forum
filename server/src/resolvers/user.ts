@@ -205,7 +205,7 @@ export class UserResolver {
 
     // send mail with defined transport object
     let info = await transporter.sendMail({
-      from: '"XOXO" <no-reply@amrthabit.com>', // sender address
+      from: '"Forum" <no-reply@amrthabit.com>', // sender address
       to: user.email, // list of receivers
       subject: "Reset Password", // Subject line
       text: "Use this link to reset your password", // plain text body

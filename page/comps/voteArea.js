@@ -194,6 +194,7 @@ export default function VoteArea({ post, theme, ...props }) {
       sx={{ gridArea: "vote", flexDirection: "column", padding: 1 }}
     >
       <LoadingButton
+        aria-label="upvote"
         loading={upvoting}
         disabled={upvoting || downvoting}
         sx={{
@@ -258,6 +259,7 @@ export default function VoteArea({ post, theme, ...props }) {
         </Box>
       </Box>
       <LoadingButton
+        aria-label="downvote"
         loading={downvoting}
         onClick={handleDownvote}
         disabled={upvoting || downvoting}
