@@ -29,13 +29,14 @@ function Home({ sort = "top", displaySize, ...props }) {
         margin: 1,
         paddingBottom: 5,
         minWidth: 305,
-        gap: 1,
+        transition:"all 0.3s",
+        gap: ["xl", "lg"].includes(displaySize) ? 1 : 0,
       }}
     >
       <Box
         id="posts-column"
         sx={{
-          marginLeft: "auto",
+          mx: "auto",
           display: "flex",
           flexDirection: "column",
           gap: 2,
@@ -105,6 +106,7 @@ function Home({ sort = "top", displaySize, ...props }) {
               key={post.id}
               post={post}
               theme={theme}
+              displaySize={displaySize}
               showTopComment
               {...props}
             />
