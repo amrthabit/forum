@@ -25,10 +25,11 @@ import { PostResolver } from "./resolvers/post";
 import { PostedResolver } from "./resolvers/posted";
 import { UserResolver } from "./resolvers/user";
 import { VoteResolver } from "./resolvers/vote";
+import { MyConfig, MyConfigIndex, MyConfigs } from "./types";
 
 const main = async () => {
   dotenv.config();
-  const configurations: any = {
+  const configurations: MyConfigs = {
     production: {
       ssl: true,
       port: 443,
@@ -42,9 +43,9 @@ const main = async () => {
       origin: "http://localhost:3000",
     },
   };
-  const environment = process.env.NODE_ENV || "development";
-  const prod = environment === "production";
-  const config = configurations[environment];
+  const prod = process.env.NODE_ENV === "production";
+  const environment : MyConfigIndex = prod ? "production" : "development";
+  const config : MyConfig = configurations[environment];
 
   const orm = await MikroORM.init(mikroOrmConfig);
   await orm.getMigrator().up();
@@ -97,6 +98,7 @@ const main = async () => {
       : // need this to play around in graphql GUI
         [ApolloServerPluginLandingPageGraphQLPlayground],
     context: ({ req, res }) => ({ em: orm.em, req, res, redis }),
+    cache: "bounded",
   });
   await apolloServer.start();
   apolloServer.applyMiddleware({
@@ -107,8 +109,7 @@ const main = async () => {
   // create HTTP or HTTPS server, per configuration
   let server;
   if (config.ssl) {
-    // Assumes certificates are in .ssl folder from package root. Make sure the files
-    // are secured.
+    // certificate files from certbot in environment variables
     server = https.createServer(
       {
         cert: fs.readFileSync(process.env.PATH_TO_CERTIFICATE as string),
@@ -119,7 +120,7 @@ const main = async () => {
   } else {
     server = http.createServer(app);
   }
-
+ 
   server.listen(SERVER_PORT, () => {
     console.log(
       `Server started on ${
