@@ -19,7 +19,6 @@ export default function Post({ post, theme, isSole, ...props }) {
   const [{ data: meQuery, fetching }] = useMeQuery({
     // pause: isServer,
   });
-
   const [, deletePost] = useDeletePostMutation();
   const [deleting, setDeleting] = useState(false);
   const [isDeleted, setIsDeleted] = useState(false);
@@ -27,7 +26,6 @@ export default function Post({ post, theme, isSole, ...props }) {
   const [hideTopComment, setHideTopComment] = useState(false);
 
   const router = useRouter();
-
   const [readableTime, setReadableTime] = useState();
   useEffect(() => {
     setReadableTime(msToString(post.createdAt));
@@ -250,7 +248,7 @@ export default function Post({ post, theme, isSole, ...props }) {
               flexDirection: "row",
               marginLeft: "auto",
               marginRight: 1,
-              overflow:"hidden"
+              overflow: "hidden",
             }}
           >
             <LoadingButton

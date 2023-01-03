@@ -48,7 +48,7 @@ export class UserResolver {
     return await em.find(User, {});
   }
 
-  // TODO!: don't forget to remove this from production /// /// /// /// /// /// /// /// ///
+  // TODO!: remove this from production /// /// /// /// /// /// /// /// ///
   @Mutation(() => [User])
   async deleteAllUsers(@Ctx() { em }: MyContext) {
     const res = await em.find(User, {});
@@ -90,7 +90,7 @@ export class UserResolver {
       };
     }
 
-    // if user doesn't exist, create it
+    // user doesn't exist, create it
     const hashedPassword = await argon2.hash(newUserPassword);
     const response = await (em as EntityManager)
       .createQueryBuilder(User)
