@@ -1,4 +1,4 @@
-# xo
+# forum
 CRUD practice using Next.js, Redis, Graphql, MikroOrm
 
 # usage
