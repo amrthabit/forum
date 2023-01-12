@@ -11,6 +11,7 @@ import {
 import { createUrqlClient } from "../utils/createUrqlClient";
 import CliqueSidebar from "../comps/cliqueSidebar";
 
+// todo: #4 fix mobile view
 function Home({ sort = "top", displaySize, ...props }) {
   const [{ data }] = useGetPostsQuery({
     variables: { sort },
