@@ -10,6 +10,6 @@ At `forum/server`, create a `.env` with `DATABASE_USER`, `DATABASE_PASSWORD` alo
 
 Install Redis and start on default port
 
-`yarn tsc`, `yarn watch` and `yarn dev` on `xo/server`
+`yarn tsc`, `yarn watch` and `yarn dev` on `forum/server`
 
-`yarn dev` on `xo/page`
+`yarn dev` on `forum/page`
