@@ -17,3 +17,17 @@ export type MyContext = {
   res: Response;
   redis: Redis;
 };
+
+export type MyConfig = {
+  ssl: boolean;
+  port: number;
+  hostname: string;
+  origin: string;
+};
+
+export type MyConfigs = {
+  production: MyConfig;
+  development: MyConfig;
+};
+
+export type MyConfigIndex = "production" | "development";
