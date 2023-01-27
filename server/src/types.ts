@@ -30,4 +30,5 @@ export type MyConfigs = {
   development: MyConfig;
 };
 
+
 export type MyConfigIndex = "production" | "development";

@@ -70,7 +70,7 @@ export type Mutation = {
   changeCommentVote: Scalars['Boolean'];
   changeVote: Scalars['Boolean'];
   createComment: Comment;
-  createPost: Post;
+  createPost?: Maybe<Post>;
   createPosted: Scalars['Boolean'];
   deleteAllCliques: Array<Clique>;
   deleteAllComments: Scalars['Boolean'];
@@ -466,7 +466,7 @@ export type CreatePostMutationVariables = Exact<{
 }>;
 
 
-export type CreatePostMutation = { __typename?: 'Mutation', createPost: { __typename?: 'Post', id: number } };
+export type CreatePostMutation = { __typename?: 'Mutation', createPost?: { __typename?: 'Post', id: number } | null };
 
 export type CreatePostedMutationVariables = Exact<{
   postID: Scalars['Float'];
