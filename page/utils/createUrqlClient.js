@@ -66,8 +66,8 @@ function invalidatePostVotes(cache) {
     });
   }
 }
-const serverURL = "http://localhost:4000/graphql";
-// const serverURL = "https://xo.amrthabit.com/api/graphql"
+const serverURL ="https://forum.amrthabit.com/api/graphql";
+// const serverURL = "http://localhost:4000/graphql";
 
 export const createUrqlClient = (ssrExchange) => ({
   url: serverURL,

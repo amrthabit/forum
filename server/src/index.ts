@@ -44,8 +44,8 @@ const main = async () => {
     },
   };
   const prod = process.env.NODE_ENV === "production";
-  const environment: MyConfigIndex = prod ? "production" : "development";
-  const config: MyConfig = configurations[environment];
+  const environment : MyConfigIndex = prod ? "production" : "development";
+  const config : MyConfig = configurations[environment];
 
   const orm = await MikroORM.init(mikroOrmConfig);
   await orm.getMigrator().up();
@@ -120,10 +120,12 @@ const main = async () => {
   } else {
     server = http.createServer(app);
   }
-
+ 
   server.listen(SERVER_PORT, () => {
     console.log(
-      `Server started on ${config.hostname}:${config.port}\nAllowing CORS from ${config.origin}`
+      `Server started on ${
+        config.hostname
+      }:${config.port}\nAllowing CORS from ${config.origin}`
     );
   });
 };
