@@ -12,7 +12,7 @@ function MyApp({ Component, pageProps }) {
     <ThemeProvider theme={theme}>
       <Head>
         <title>Forum</title>
-        <meta name="viewport" description="Forum" />
+        <meta content="width=device-width; initial-scale=1; maximum-scale=1; user-scalable=0; name=viewport" description="Forum" />
       </Head>
       <GlobalCSS theme={theme} />
       <Header theme={theme} displaySize={displaySize} />
