@@ -151,6 +151,7 @@ function MuiHeader({ displaySize, ...props }) {
   const handleCloseUserMenu = () => {
     setAnchorUser(null);
   };
+  
 
   return (
     <ThemeProvider theme={theme}>
