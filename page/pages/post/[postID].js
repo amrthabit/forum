@@ -43,7 +43,7 @@ function Post({ theme, ...props }) {
       }
     }
     view();
-  }, [data]);
+  }, [data, didViewPost, viewingPost, viewPost]);
 
   useEffect(() => {
     if (rawPostID === "[deleted]") {
@@ -56,7 +56,7 @@ function Post({ theme, ...props }) {
     } else {
       setMessage("");
     }
-  }, [fetching, data]);
+  }, [fetching, data, rawPostID]);
 
   return (
     <Box

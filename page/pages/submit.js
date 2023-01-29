@@ -12,6 +12,7 @@ import {
 } from "../src/generated/graphql";
 import { createUrqlClient } from "../utils/createUrqlClient";
 import SquareButton from "../comps/squareButton";
+import Image from "next/image";
 
 function Submit({ currentPostType = "text", ...props }) {
   const router = useRouter();
@@ -270,7 +271,7 @@ function Submit({ currentPostType = "text", ...props }) {
                     overflow: "hidden",
                   }}
                 >
-                  <img
+                  <Image
                     src={post.content.text}
                     alt="invalid url"
                     width="100%"

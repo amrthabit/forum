@@ -33,7 +33,7 @@ function Post({ theme }) {
     } else {
       setMessage("");
     }
-  }, [fetching, data]);
+  }, [fetching, data, rawPostID]);
 
   return (
     <Box

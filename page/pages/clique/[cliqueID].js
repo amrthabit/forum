@@ -56,14 +56,14 @@ function Clique({ theme, ...props }) {
     } else {
       setMessage("");
     }
-  }, [fetching, data]);
+  }, [fetching, data, cliqueID]);
 
   const [{ data: postsData }] = useGetPostsQuery({
     variables: { clique: cliqueID },
   });
 
   return (
-    <Box sx={{ width: "100%", display:'flex' }}>
+    <Box sx={{ width: "100%", display: "flex" }}>
       <Box
         id="posts-column"
         sx={{
@@ -76,7 +76,7 @@ function Clique({ theme, ...props }) {
           display: "flex",
           flexDirection: "column",
           gap: 1,
-          padding:1
+          padding: 1,
         }}
       >
         {message}
